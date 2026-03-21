@@ -1,0 +1,6 @@
+.env*
+*.env
+model_config.json
+*.pyc
+.ipynb_checkpoints/
+.env
