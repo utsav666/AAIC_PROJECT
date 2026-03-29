@@ -1,0 +1,36 @@
+
+--- Record 1 ---
+owner_name: गोपाळ चंद
+plot_number: 341
+plot_area: 1218 वर्ग मीटर
+location: गाँव हसनपुरा
+document_date: 11-2-24
+document_type: परोविन्य
+additional_details: रद्द (Cancellation)
+
+--- Record 2 ---
+owner_name: 
+plot_number: 
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: 
+
+--- Record 3 ---
+owner_name: चेतराम मी. जोखी
+plot_number: 139, 138/2
+plot_area: 3489 वर्ग मीटर
+location: गांव - सुढिला
+document_date: 23-12-2020
+document_type: बाज़ार हस्तांतरण
+additional_details: नक्शा संलग्न
+
+--- Record 4 ---
+owner_name: गोविन्द
+plot_number: 22
+plot_area: 
+location: 
+document_date: 15-2-14
+document_type: 
+additional_details: TRUE COPY

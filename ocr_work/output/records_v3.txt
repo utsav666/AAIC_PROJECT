@@ -1,0 +1,72 @@
+
+--- Record 1 ---
+owner_name: रावी दत्त शर्मा
+plot_number: 1129
+plot_area: 
+location: (San Francisco)
+document_date: December, 1864
+document_type: 
+additional_details: the last loni words he whispered to me were “ Ed was a good boy evidently, and I have full faith in him. Plaine, American Consul at Belfast, honorably testy negotiations for us. had better think it over very well before this season that we can only perceive in This theory was finally established to be anybody to accept this position. Yet, and that this could not be a special since. agent
+
+--- Record 2 ---
+owner_name: कुलीन सिंह
+plot_number: 2281
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: 
+
+--- Record 3 ---
+owner_name: गोविन्दराम
+plot_number: 
+plot_area: 
+location: 
+document_date: March 1st, 1863
+document_type: 
+additional_details: Page number: 40
+
+--- Record 4 ---
+owner_name: रवि
+plot_number: 
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: Numbers: 219, 196, 908, 2121, 911, 2121, 99, 32, 211, 39, 202, 2269, 215, 211, 97, 92, 37. The image is difficult to decipher due to its quality and handwriting. It appears to be a table with numbers and some handwritten text, but specific details such as date or location are not clearly readable.
+
+--- Record 5 ---
+owner_name: गीतराम सिंह
+plot_number: 3/12
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: Numbers include: 51, 77-2, 216, 99, 211, 99-2, 210, 3/15, 52, 220
+
+--- Record 6 ---
+owner_name: गीता हिदालच्या
+plot_number: 
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: Numbers: 208, 153, 171, 964, 264
+
+--- Record 7 ---
+owner_name: I can't extract or recognize person names from the image.
+plot_number: 
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: Numbers: 6,09,850 - 12.04, Extra: 41
+
+--- Record 8 ---
+owner_name: रामनाथ
+plot_number: 73
+plot_area: 150 Sq.yards
+location: 
+document_date: 
+document_type: 
+additional_details: 

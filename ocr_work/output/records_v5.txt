@@ -1,0 +1,40 @@
+
+--- Record 1 ---
+owner_name: सरावगी ईजे सिंग
+plot_number: 24/2/8
+plot_area: 287
+location: ग्राम बैंकट
+document_date: 2023-10-15
+document_type: पबू
+additional_details: माक्सालिस वूतर पूजन पत्रां
+confidence: HIGH
+
+--- Record 2 ---
+owner_name: ममता सन
+plot_number: 507
+plot_area: 
+location: बृजेश चिन्तु परेशान मुझे मालूम हिन्दू प्रेम पानी शर्मा अल्पना रोम तय्य
+document_date: 
+document_type: land_record
+additional_details: This document appears to relate to land ownership or land tax payments. It mentions specific names and terms common in land records like 'खाता' (account), 'काट' (cut), 'खान मालोजी' (individual or entity reference), and other numbers likely correlating to plot sizes or account numbers.
+confidence: MEDIUM
+
+--- Record 3 ---
+owner_name: मंजु चपा
+plot_number: 4451
+plot_area: 740 (5) बग (SA)
+location: उमरक
+document_date: 31
+document_type: कसदंस दूव
+additional_details: ९९ २ - २२३
+confidence: MEDIUM
+
+--- Record 4 ---
+owner_name: सावंत
+plot_number: 299 2 -29 214
+plot_area: 236
+location: पुणे
+document_date: 15-2-14
+document_type: TRUE COPY
+additional_details: महिला सेवा २१४ मसूद २९३ अन्तिम ३१ पास
+confidence: HIGH

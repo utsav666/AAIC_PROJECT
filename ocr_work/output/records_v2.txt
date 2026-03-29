@@ -1,0 +1,27 @@
+
+--- Record 1 ---
+owner_name: चन्द्रशेखर
+plot_number: 3241
+plot_area: 237
+location: धनिया
+document_date: 12/09/1932
+document_type: मुतालिका
+additional_details: बन्धक बकाया कबूल
+
+--- Record 2 ---
+owner_name: नन्दबिहारी
+plot_number: 1879
+plot_area: 214
+location: नेवरा
+document_date: 
+document_type: 
+additional_details: सहकारी भूमि
+
+--- Record 3 ---
+owner_name: राम सिंह
+plot_number: 327
+plot_area: 215
+location: 
+document_date: 
+document_type: चयनित दस्तावेज़
+additional_details: 10/03

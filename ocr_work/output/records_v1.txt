@@ -1,0 +1,29 @@
+
+--- Record 1 ---
+owner_name: 
+plot_number: 
+plot_area: 
+location: 
+document_date: 
+document_type: 
+additional_details: 
+
+--- Record 2 ---
+owner_name: 
+plot_number: 334
+plot_area: 
+location: गंगापुर
+document_date: 
+document_type: 
+additional_details: गाँव स.न 334 गंगापुर 22-309 3034 पूलन नगरिया, 84 -8-आस8352 हिनिया बिआ-31 चतोतविवअति स्योना मनांक 12 समिया २ कन्विनाफ्रणिणा, चक महसूल, मगरायगांव, तहसील नायसर
+
+--- Record 3 ---
+
+--- Record 4 ---
+owner_name: मुंशी तापर
+plot_number: 189
+plot_area: १९३५
+location: ग्राम भीम
+document_date: १२-११-५६
+document_type: भूमिगत
+additional_details: संपत्ति
