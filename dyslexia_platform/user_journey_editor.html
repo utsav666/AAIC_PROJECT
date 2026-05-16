@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dyslexia Platform - User Journey Editor</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1e1e2e; color: #cdd6f4; }
+        .container { display: flex; height: 100vh; }
+        .editor-panel {
+            width: 40%;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #45475a;
+        }
+        .preview-panel {
+            width: 60%;
+            padding: 16px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 { font-size: 18px; margin-bottom: 12px; color: #89b4fa; }
+        h2 { font-size: 14px; margin-bottom: 8px; color: #a6adc8; }
+        textarea {
+            flex: 1;
+            background: #313244;
+            color: #cdd6f4;
+            border: 1px solid #45475a;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            resize: none;
+            line-height: 1.5;
+        }
+        textarea:focus { outline: 2px solid #89b4fa; border-color: transparent; }
+        .btn-row { margin: 12px 0; display: flex; gap: 8px; }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-render { background: #89b4fa; color: #1e1e2e; }
+        .btn-render:hover { background: #74c7ec; }
+        .btn-copy { background: #a6e3a1; color: #1e1e2e; }
+        .btn-copy:hover { background: #94e2d5; }
+        .btn-reset { background: #f38ba8; color: #1e1e2e; }
+        .btn-reset:hover { background: #eba0ac; }
+        #preview {
+            flex: 1;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: auto;
+        }
+        #preview svg { width: 100%; height: auto; display: block; }
+        .status { font-size: 12px; margin-top: 8px; color: #a6adc8; }
+        .error { color: #f38ba8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-panel">
+            <h1>✏️ Mermaid Diagram Editor</h1>
+            <h2>Edit the diagram code below:</h2>
+            <textarea id="code">flowchart TD
+    %% Start node
+    START([🚀 Start]) --> A
+
+    %% Phase 1: Onboarding
+    subgraph P1["🟦 Phase 1: Onboarding"]
+        A[👤 Register]
+        B[Parent Account]
+        C[Child Profile]
+        D{First Time?}
+        A --> B
+        B --> C
+        C --> D
+    end
+
+    %% Phase 2: Assessment
+    subgraph P2["🟩 Phase 2: AI Assessment"]
+        E[🧪 Assessment Test]
+        T1[Phonemic Awareness]
+        T2[Letter Recognition]
+        T3[Reading Speed]
+        T4[Comprehension]
+        T5[Visual Processing]
+        G[🤖 AI Scoring]
+        H{Classification}
+        L12[Level 1-2]
+        L34[Level 3-4]
+        L5[Level 5]
+        PATH[📚 Learning Path Created]
+        E --> T1
+        E --> T2
+        E --> T3
+        E --> T4
+        E --> T5
+        T1 --> G
+        T2 --> G
+        T3 --> G
+        T4 --> G
+        T5 --> G
+        G --> H
+        H -->|Mild| L12
+        H -->|Moderate| L34
+        H -->|Severe| L5
+        L12 --> PATH
+        L34 --> PATH
+        L5 --> PATH
+    end
+
+    %% Phase 3: Daily Learning
+    subgraph P3["🟨 Phase 3: Daily Learning Loop"]
+        direction LR
+        SESSION[📖 Session]
+        ACT[Activity]
+        EVAL{🤖 Pass?}
+        NEXT[Next Module]
+        DONE{Level Done?}
+        SESSION --> ACT
+        ACT --> EVAL
+        EVAL -->|Yes| NEXT
+        EVAL -->|No| SESSION
+        NEXT --> DONE
+    end
+
+    %% Phase 3 AI Support
+    subgraph P3AI["🧠 AI in Learning"]
+        direction LR
+        ADAPT[Adaptive Difficulty]
+        HINT[Smart Hints]
+        STYLE[Learning Style Switch]
+    end
+
+    %% Phase 4: Progression
+    subgraph P4["🟥 Phase 4: Level Progression"]
+        REASSESS[🧪 Re-Assessment]
+        DECIDE{Promote?}
+        UP[⬆️ Next Level]
+        STAY[🔁 Reinforce]
+        REASSESS --> DECIDE
+        DECIDE -->|Yes| UP
+        DECIDE -->|No| STAY
+    end
+
+    %% Phase 4 AI Support
+    subgraph P4AI["🧠 AI in Progression"]
+        direction LR
+        PREDICT[Readiness Prediction]
+        GAP[Gap Analysis]
+        REPORT[Parent Insights]
+    end
+
+    %% AI connections
+    EVAL -.->|feeds| P3AI
+    P3AI -.->|adjusts| ACT
+    REASSESS -.->|uses| P4AI
+    P4AI -.->|informs| DECIDE
+
+    %% Connections between phases
+    D -->|Yes| E
+    D -->|No| SESSION
+    PATH --> SESSION
+    DONE -->|Yes| REASSESS
+    UP --> SESSION
+    STAY --> SESSION</textarea>
+            <div class="btn-row">
+                <button class="btn-render" onclick="renderDiagram()">▶️ Render</button>
+                <button class="btn-copy" onclick="copyCode()">📋 Copy Code</button>
+                <button class="btn-reset" onclick="resetCode()">🔄 Reset</button>
+            </div>
+            <div class="status" id="status">Press Render or Ctrl+Enter to update the diagram</div>
+        </div>
+        <div class="preview-panel">
+            <h1>📊 Live Preview</h1>
+            <div id="preview"></div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+
+        const defaultCode = document.getElementById('code').value;
+
+        async function renderDiagram() {
+            const code = document.getElementById('code').value;
+            const preview = document.getElementById('preview');
+            const status = document.getElementById('status');
+            try {
+                const { svg } = await mermaid.render('mermaid-svg', code);
+                preview.innerHTML = svg;
+                status.textContent = '✅ Rendered successfully at ' + new Date().toLocaleTimeString();
+                status.className = 'status';
+            } catch (e) {
+                status.textContent = '❌ Error: ' + e.message;
+                status.className = 'status error';
+                // Clear broken render element
+                const el = document.getElementById('mermaid-svg');
+                if (el) el.remove();
+            }
+        }
+
+        function copyCode() {
+            navigator.clipboard.writeText(document.getElementById('code').value);
+            document.getElementById('status').textContent = '📋 Copied to clipboard!';
+        }
+
+        function resetCode() {
+            document.getElementById('code').value = defaultCode;
+            renderDiagram();
+        }
+
+        // Ctrl+Enter to render
+        document.getElementById('code').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); renderDiagram(); }
+            // Tab support
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const ta = e.target;
+                const start = ta.selectionStart;
+                ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(ta.selectionEnd);
+                ta.selectionStart = ta.selectionEnd = start + 4;
+            }
+        });
+
+        // Initial render
+        renderDiagram();
+    </script>
+</body>
+</html>
