@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Lexend', 'Segoe UI', sans-serif;
+}
+
+body {
+  background: linear-gradient(140deg, #e0f7f4 0%, #ede9fe 55%, #fce8f3 100%);
+  min-height: 100vh;
+}
+
+/* Smooth transitions */
+* { transition: color 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease; }
+
+/* Remove input autofill yellow */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(135deg, #0d9488, #7c3aed);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.btn-gradient:hover { opacity: 0.92; transform: translateY(-1px); }
+.btn-gradient:active { transform: translateY(0); }
+
+/* Card */
+.card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.09);
+}

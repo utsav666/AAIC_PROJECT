@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empower You — AI Architecture Explorer</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --card: #334155;
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --accent1: #6366f1;
+      --accent2: #8b5cf6;
+      --accent3: #ec4899;
+      --accent4: #f59e0b;
+      --green: #10b981;
+      --border: #475569;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* ─── Orchestrator Container ─── */
+    .orchestrator-container {
+      max-width: 1100px;
+      margin: 0 auto 32px;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      background: linear-gradient(180deg, rgba(99,102,241,0.03) 0%, rgba(236,72,153,0.03) 100%);
+    }
+    .orchestrator-label {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3), var(--accent4));
+      padding: 4px 20px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ─── Flow inside orchestrator ─── */
+    .orch-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .phase-box {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+    .phase-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    }
+    .phase-box.active {
+      border-color: var(--accent1);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+    .phase-box .phase-num {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .phase-box .phase-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .phase-box .phase-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .phase-box.p1 { border-top: 3px solid var(--accent1); }
+    .phase-box.p2 { border-top: 3px solid var(--accent2); }
+    .phase-box.p3 { border-top: 3px solid var(--accent3); }
+    .phase-box.p4 { border-top: 3px solid var(--accent4); }
+    .phase-box.p1 .phase-num { color: var(--accent1); }
+    .phase-box.p2 .phase-num { color: var(--accent2); }
+    .phase-box.p3 .phase-num { color: var(--accent3); }
+    .phase-box.p4 .phase-num { color: var(--accent4); }
+
+    /* ─── Confidence Gates ─── */
+    .gate {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .gate:hover .gate-circle {
+      transform: scale(1.15);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+    }
+    .gate.active .gate-circle {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4), 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+    .gate-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      border: 2px solid #34d399;
+    }
+    .gate-label {
+      font-size: 9px;
+      color: var(--green);
+      margin-top: 4px;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* ─── Arrow connectors ─── */
+    .connector {
+      width: 24px;
+      height: 2px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ─── Detail Panel ─── */
+    .detail-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+      min-height: 300px;
+    }
+    .detail-panel h2 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+    .detail-panel .detail-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    /* ─── Agent Cards ─── */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .agent-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .agent-card:hover {
+      border-color: var(--accent1);
+      transform: translateY(-2px);
+    }
+    .agent-card.active {
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+    .agent-card .agent-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .agent-card .agent-type { font-size: 11px; margin-bottom: 8px; }
+    .agent-card .agent-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    /* ─── Inner Flow ─── */
+    .inner-flow {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 16px;
+    }
+    .inner-flow h3 {
+      font-size: 15px;
+      margin-bottom: 16px;
+      color: var(--green);
+    }
+    .flow-steps { display: flex; flex-direction: column; gap: 12px; }
+    .flow-step { display: flex; align-items: flex-start; gap: 12px; }
+    .step-num {
+      background: var(--card);
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-content { font-size: 13px; line-height: 1.5; color: var(--muted); }
+    .step-content strong { color: var(--ink); }
+
+    /* ─── Gate Decision Cards ─── */
+    .gate-decisions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .gate-decision {
+      border-radius: 10px;
+      padding: 14px;
+      border: 1px solid;
+    }
+    .gate-decision .gd-condition { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .gate-decision .gd-action { font-size: 12px; line-height: 1.5; }
+    .gd-high { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.3); }
+    .gd-high .gd-condition { color: #10b981; }
+    .gd-medium { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); }
+    .gd-medium .gd-condition { color: #f59e0b; }
+    .gd-low { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); }
+    .gd-low .gd-condition { color: #ef4444; }
+    .gd-conflict { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.3); }
+    .gd-conflict .gd-condition { color: #8b5cf6; }
+
+    /* ─── Confidence Formula ─── */
+    .formula-box {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'SF Mono', monospace;
+      font-size: 12px;
+      color: #a5f3fc;
+      margin: 12px 0;
+    }
+
+    /* ─── Lens Grid ─── */
+    .lens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .lens-item {
+      background: var(--card);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .lens-item:hover { border-color: var(--accent3); background: rgba(236,72,153,0.1); }
+    .lens-item.active { border-color: var(--accent3); background: rgba(236,72,153,0.15); }
+    .lens-item .lens-icon { font-size: 22px; margin-bottom: 4px; }
+    .lens-item .lens-name { font-weight: 600; font-size: 10px; }
+
+    .lens-detail { background: var(--card); border-radius: 12px; padding: 20px; margin-top: 16px; }
+    .lens-detail h4 { margin-bottom: 12px; font-size: 14px; }
+    .criteria-list { list-style: none; padding: 0; }
+    .criteria-list li {
+      font-size: 12px; color: var(--muted); padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+    }
+    .criteria-list li:last-child { border: none; }
+    .criteria-list .reveals { color: var(--green); font-size: 11px; }
+
+    /* ─── Output Box ─── */
+    .output-box {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-family: 'SF Mono', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #a5f3fc;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .tag-ai { background: rgba(99,102,241,0.2); color: #818cf8; }
+    .tag-code { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+    .tag-vlm { background: rgba(236,72,153,0.2); color: #f472b6; }
+
+    @media (max-width: 900px) {
+      .orch-flow { flex-wrap: wrap; gap: 8px; }
+      .connector { display: none; }
+      body { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Empower You — AI Architecture</h1>
+<p class="subtitle">The orchestrator contains all stages + confidence gates. Click any element to explore.</p>
+
+<!-- ═══ ORCHESTRATOR (wraps everything) ═══ -->
+<div class="orchestrator-container">
+  <div class="orchestrator-label" style="cursor:pointer" onclick="showOrchestratorOverview()">⚙️ Deterministic Orchestrator — Python Code Controls Everything (click for overview)</div>
+
+  <div class="orch-flow">
+    <!-- Stage 1 -->
+    <div class="phase-box p1" onclick="showPhase(1)">
+      <div class="phase-num">Stage 1</div>
+      <div class="phase-title">📄 Profile</div>
+      <div class="phase-desc">Upload resume/docs</div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- Gate 1 -->
+    <div class="gate" onclick="showGate(1)">
+      <div class="gate-circle">⚡</div>
+      <div class="gate-label">Gate 1</div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- Stage 2 -->
+    <div class="phase-box p2" onclick="showPhase(2)">
+      <div class="phase-num">Stage 2</div>
+      <div class="phase-title">🧠 Psychometric</div>
+      <div class="phase-desc">Scenario questions</div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- Gate 2 -->
+    <div class="gate" onclick="showGate(2)">
+      <div class="gate-circle">🧠</div>
+      <div class="gate-label">Gate 2</div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- Stage 3 -->
+    <div class="phase-box p3" onclick="showPhase(3)">
+      <div class="phase-num">Stage 3</div>
+      <div class="phase-title">🎬 Showcase</div>
+      <div class="phase-desc">Demonstrate skill</div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- Gate 3 -->
+    <div class="gate" onclick="showGate(3)">
+      <div class="gate-circle">✅</div>
+      <div class="gate-label">Gate 3</div>
+    </div>
+
+    <div class="connector"></div>
+
+    <!-- Stage 4 -->
+    <div class="phase-box p4" onclick="showPhase(4)">
+      <div class="phase-num">Stage 4</div>
+      <div class="phase-title">🎯 Career Path</div>
+      <div class="phase-desc">Match + Guide</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TECH STACK & COSTING BUTTONS ═══ -->
+<div style="text-align:center;margin-bottom:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+  <button onclick="showTechStack()" style="padding:10px 24px;border-radius:10px;border:2px solid var(--accent1);background:transparent;color:var(--accent1);font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s ease;letter-spacing:0.5px" onmouseover="this.style.background='var(--accent1)';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='var(--accent1)'">🛠️ Tech Stack</button>
+  <button onclick="showCosting()" style="padding:10px 24px;border-radius:10px;border:2px solid #f59e0b;background:transparent;color:#f59e0b;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s ease;letter-spacing:0.5px" onmouseover="this.style.background='#f59e0b';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='#f59e0b'">💰 Costing</button>
+</div>
+
+<!-- ═══ DETAIL PANEL ═══ -->
+<div class="detail-panel" id="detailPanel">
+  <h2>👆 Click any stage or gate above</h2>
+  <p class="detail-subtitle">Stages show their agents. Gates show the orchestrator's decision logic between stages.</p>
+</div>
+
+<script>
+// ─── Phase Data ───
+const phases = {
+  1: {
+    title: "📄 Stage 1: Profile Evaluator",
+    subtitle: "Parse uploaded documents to understand who the student is on paper",
+    agents: [
+      {
+        name: "Agent 1: Profile Parser",
+        type: "VLM (Vision-Language Model)",
+        tag: "tag-vlm",
+        desc: "Deep multi-pass document analysis. 4 reasoning passes: Extract → Infer → Identify Gaps → Generate Hypotheses. Takes 2-3 min for thorough analysis.",
+        flow: [
+          { step: "Pass 1 — EXTRACT: What facts are in these documents?", detail: "Academics, activities, achievements, certifications — raw structured data from all uploaded files" },
+          { step: "Pass 2 — INFER: What do these facts imply?", detail: "'5 years classical dance + state competition' → discipline, long-term commitment, performing arts passion, competitive drive" },
+          { step: "Pass 3 — IDENTIFY GAPS: What's missing?", detail: "No teamwork mentions? No failures? Suspiciously perfect? Flag areas for psychometric to probe deeper." },
+          { step: "Pass 4 — GENERATE HYPOTHESES: What career directions might fit?", detail: "Not deciding — forming testable hypotheses. 'Hypothesis: creative performer. Will test in Stage 2 + 3.'" },
+        ],
+        output: `{
+  "facts": {
+    "academics": {"level": "10th", "strengths": ["math", "science"]},
+    "achievements": ["state-level dance", "coding hackathon winner"],
+    "activities": ["classical dance 5 years", "python programming"]
+  },
+  "inferences": {
+    "discipline": "high (5 years sustained practice)",
+    "competitive_drive": "high (state-level competition)",
+    "creative_expression": "likely strong (dance as primary activity)"
+  },
+  "gaps_to_probe": ["teamwork evidence missing", "no mention of failures/challenges"],
+  "hypotheses": ["creative performer", "tech-creative hybrid", "disciplined artist"]
+}`
+      }
+    ]
+  },
+  2: {
+    title: "🧠 Stage 2: Psychometric Test",
+    subtitle: "Scenario-based questions reveal thinking style, motivations, and personality",
+    agents: [
+      {
+        name: "Rule Scorer",
+        type: "Code (No AI)",
+        tag: "tag-code",
+        desc: "MCQ, slider, ranking answers → dimension scores using predefined signal mappings. Deterministic, instant.",
+        flow: [
+          { step: "MCQ answer → option signals lookup", detail: "'Build shelter' → practical + builder" },
+          { step: "Slider value → weighted left/right signals", detail: "1-2 = left, 4-5 = right, 3 = neutral" },
+          { step: "Ranking → positional weighting", detail: "Top items get highest weight" },
+          { step: "Output: rule_signals (normalized 0-1)", detail: "All 6 dimensions scored" },
+        ],
+        output: `{
+  "thinking_style": {"analytical": 0.6, "creative": 0.4, "social": 0.3, "practical": 0.5},
+  "core_driver": {"mastery": 0.7, "impact": 0.4, "freedom": 0.3, "expression": 0.5},
+  "risk_profile": {"explorer": 0.6, "builder": 0.5, "maintainer": 0.2},
+  "environment_fit": {"solo": 0.5, "flexible": 0.6, "structured": 0.3}
+}`
+      },
+      {
+        name: "Agent 2: Profile Analyst",
+        type: "LLM-as-Judge (Multi-Reasoning)",
+        tag: "tag-ai",
+        desc: "5 deep reasoning passes on text responses. Goes beyond surface meaning to detect patterns, contradictions, and hidden signals. Takes 3-5 min.",
+        flow: [
+          { step: "Pass 1 — SURFACE READING: What did they literally say?", detail: "Content analysis: themes, topics, characters they chose to write about" },
+          { step: "Pass 2 — DEEP READING: What does word choice reveal?", detail: "'From her village' = tied to roots, proving doubters wrong. Style = confident/tentative, structured/chaotic" },
+          { step: "Pass 3 — PATTERN DETECTION: What's consistent across ALL answers?", detail: "Do MCQ choices, slider positions, rankings, and text all point the same direction?" },
+          { step: "Pass 4 — CONTRADICTION ANALYSIS: Where do signals conflict?", detail: "MCQ: 'solo'. Text: passionate teamwork story. Which is real? (Usually text — harder to fake)" },
+          { step: "Pass 5 — HYPOTHESIS TESTING: Validate Stage 1 hypotheses", detail: "Profile said 'dancer'. Does psychometric confirm creative/expressive? Or reveal analytical instead?" },
+        ],
+        output: `{
+  "deep_signals": {
+    "thinking_style": {"creative": 0.8, "social": 0.5, "analytical": 0.3},
+    "core_driver": {"expression": 0.7, "impact": 0.6, "mastery": 0.4}
+  },
+  "contradictions": [
+    {"source_a": "MCQ: prefers solo", "source_b": "Text: describes leading team",
+     "resolution": "Text likely more authentic — harder to fake in narrative"}
+  ],
+  "hypothesis_results": {
+    "creative_performer": "CONFIRMED (text themes align)",
+    "tech_hybrid": "WEAKENED (no tech themes in open responses)"
+  }
+}`
+      },
+      {
+        name: "Profile Builder",
+        type: "Code (No AI)",
+        tag: "tag-code",
+        desc: "Merges all signal streams into one unified student profile vector. Weighted average.",
+        flow: [
+          { step: "Receive 3 signal streams", detail: "profile_signals (Stage 1) + rule_signals + text_signals" },
+          { step: "Apply weights", detail: "Profile: 0.25 | Rules: 0.35 | Text: 0.40" },
+          { step: "Normalize to 0-1", detail: "Each dimension comparable across students" },
+          { step: "Output: UNIFIED STUDENT PROFILE", detail: "Single source of truth for all downstream" },
+        ],
+        output: `// UNIFIED STUDENT PROFILE
+{
+  "thinking_style": {"analytical": 0.5, "creative": 0.7, "social": 0.4, "practical": 0.3},
+  "core_driver": {"mastery": 0.6, "impact": 0.5, "freedom": 0.4, "expression": 0.7},
+  "domain_attraction": {"tech": 0.6, "arts": 0.7, "business": 0.3, "health": 0.2}
+}`
+      }
+    ]
+  },
+  3: {
+    title: "🎬 Stage 3: Showcase Evaluation",
+    subtitle: "System picks what to ask based on Stage 1+2, then evaluates demonstrated skill",
+    agents: [
+      {
+        name: "Showcase Router",
+        type: "Code (No AI)",
+        tag: "tag-code",
+        desc: "Decides WHAT showcase to request based on profile + psychometric. Adaptive — not every student gets the same ask.",
+        flow: [
+          { step: "Read unified profile + skill_evidence", detail: "Top domain_attraction + Stage 1 achievements" },
+          { step: "Select showcase type", detail: "Dance evidence + creative → dance video. Coding + analytical → project demo." },
+          { step: "Present personalized request", detail: "'We noticed you love dance — show us your moves!'" },
+          { step: "Student uploads showcase", detail: "Video, audio, image, text, or code" },
+        ],
+        output: `// Decision logic (code):
+IF skill_evidence.dance == "competitive" AND domain_attraction.arts > 0.5
+   → request: "dance_video"
+
+IF skill_evidence.coding AND thinking_style.analytical > 0.5
+   → request: "code_project"
+
+IF no strong signal:
+   → offer choice from top 2-3 interests`
+      },
+      {
+        name: "Agent 3: Showcase Evaluator",
+        type: "VLM Multi-Reasoning (5 passes)",
+        tag: "tag-vlm",
+        desc: "Deep multi-pass performance analysis. Observes, assesses technically, reads personality, cross-references with earlier stages, synthesizes career signals. Takes 3-5 min.",
+        hasLenses: true,
+        flow: [
+          { step: "Pass 1 — OBSERVE: What is happening?", detail: "Describe movements, space, rhythm, expressions, energy, transitions, structure of performance" },
+          { step: "Pass 2 — TECHNICAL ASSESSMENT: How skilled?", detail: "Training years evident, technique quality, complexity level, areas of mastery vs weakness" },
+          { step: "Pass 3 — PERSONALITY READING: What does this reveal?", detail: "Confidence, emotional range, discipline vs freedom, audience-awareness, self-expression style" },
+          { step: "Pass 4 — CROSS-REFERENCE: Does this match earlier findings?", detail: "Profile said 'competitive dancer'. Test said 'creative/expressive'. Does showcase CONFIRM or CONTRADICT?" },
+          { step: "Pass 5 — CAREER SIGNAL SYNTHESIS: What careers align?", detail: "High expressiveness + moderate technique + strong storytelling → creative director > performer > teacher" },
+        ],
+        output: `{
+  "observation": "Contemporary dance piece, 45 seconds, uses full space...",
+  "skill_scores": {"technical": 0.7, "creativity": 0.8, "discipline": 0.8, "expressiveness": 0.9},
+  "personality_reading": {
+    "confidence": "high — owns the space",
+    "expression_style": "storytelling through movement, not just technical execution",
+    "discipline_vs_freedom": "70% choreographed, 30% improvised — structured creative"
+  },
+  "cross_validation": {
+    "profile_hypothesis_confirmed": true,
+    "new_insight": "Technique is good but expression is EXCEPTIONAL — suggests direction over execution"
+  },
+  "career_signals": {
+    "strong_fit": ["choreographer", "creative_director"],
+    "reasoning": "Expression >> technique indicates creative leadership, not just performance"
+  }
+}`
+      }
+    ]
+  },
+  4: {
+    title: "🎯 Stage 4: Career Path",
+    subtitle: "All signals converge — deterministic matching + AI reasoning for personalized guidance",
+    agents: [
+      {
+        name: "Career Matcher",
+        type: "Algorithm (No AI)",
+        tag: "tag-code",
+        desc: "Student profile × career ideal profiles → ranked matches. Deterministic, explainable, consistent.",
+        flow: [
+          { step: "Load career DB (30+ careers with ideal profiles)", detail: "Each career: ideal dimensions, Indian pathways, colleges, exams" },
+          { step: "Merge showcase into unified profile", detail: "Boost dimensions showcase confirmed" },
+          { step: "Compute match score per career", detail: "Weighted dot product = alignment score" },
+          { step: "Extract reasons and gaps", detail: "Strong alignment = reason. Weak = gap" },
+          { step: "Rank top 5", detail: "Career + score + reasons + gaps" },
+        ],
+        output: `[
+  {"career": "Choreographer", "score": 0.91,
+   "reasons": ["High creativity", "Proven dance skill", "Flexible preference"],
+   "gaps": ["May need business skills"]},
+  {"career": "UX Designer", "score": 0.84,
+   "reasons": ["Creative + tech interest", "Visual-spatial skills"],
+   "gaps": ["Needs prototyping skills"]}
+]`
+      },
+      {
+        name: "Agent 4: Career Reasoning Engine",
+        type: "LLM Deep Reasoning (7 passes)",
+        tag: "tag-ai",
+        desc: "The deepest reasoning agent. 7 passes: Synthesize → Explore → Evaluate → India Context → Pathways → Confidence → Communicate. Takes 5-8 min for thorough career analysis.",
+        flow: [
+          { step: "Pass 1 — SYNTHESIZE: Who is this student?", detail: "Narrative understanding combining all signals: 'Creative, expressive, disciplined, freedom-seeking, proven performer with competitive drive'" },
+          { step: "Pass 2 — EXPLORE: Generate 8-10 career possibilities", detail: "Don't narrow early. Include unconventional: dance therapist? UX choreographer? Movement director for film? Creative consultant?" },
+          { step: "Pass 3 — DEEP EVALUATE: Will they THRIVE long-term?", detail: "For each: sustainability at age 30? Burnout risk? Growth ceiling? Satisfaction prediction? Matches core drivers?" },
+          { step: "Pass 4 — INDIA CONTEXT: Reality check", detail: "Viable in India? Job market? Salary livability? Parental acceptance likely? Clear path from current standard?" },
+          { step: "Pass 5 — PATHWAY: Detailed roadmap for top 3", detail: "Stream choice → exams → colleges → backup plans → skills to build now vs later → 6-month next steps" },
+          { step: "Pass 6 — CONFIDENCE: How sure are we?", detail: "Cite specific evidence for each recommendation. Flag where uncertainty remains. Set confidence tag." },
+          { step: "Pass 7 — COMMUNICATE: Write for a teenager", detail: "Warm, personal, motivating. Reference THEIR specific achievements. Make the path feel achievable." },
+        ],
+        output: `{
+  "synthesis": "Creative leader with performing arts mastery and emerging tech interest...",
+  "explored_careers": ["Choreographer", "Creative Director", "UX Designer", "Dance Therapist",
+                       "Content Creator", "Event Director", "Arts Administrator", "Filmmaker"],
+  "top_3_evaluated": [
+    {"career": "Choreographer / Creative Director", "score": 0.91,
+     "long_term": "High satisfaction — expression + mastery fulfilled. Growth: own company by 30.",
+     "burnout_risk": "Low — passion-driven",
+     "india_viable": "Yes — Bollywood, advertising, events, education sectors"},
+    ...
+  ],
+  "pathways": {"Choreographer": {"stream": "Humanities", "exams": ["NIFT","NID"], ...}},
+  "confidence": {"level": "definitive", "evidence_strength": "3/3 sources agree"},
+  "narrative": "Priya, you're a born performer with the mind of a creative leader..."
+}`
+      },
+      {
+        name: "Cross-Validator",
+        type: "Code + LLM Reasoning",
+        tag: "tag-ai",
+        desc: "Triangulates all 3 signal sources. Identifies what ALL evidence agrees on, where conflicts exist, and which source to trust for this specific student.",
+        flow: [
+          { step: "Compare profile signals vs psychometric signals", detail: "Do achievements match personality? Or is there a disconnect?" },
+          { step: "Compare both vs showcase performance", detail: "Does the demonstrated skill confirm or contradict earlier signals?" },
+          { step: "Resolve conflicts with evidence weighting", detail: "Behavioral evidence (showcase) > text (psychometric) > self-reported (profile)" },
+          { step: "Update unified profile with cross-validated scores", detail: "Strengthen confirmed dimensions, weaken contradicted ones, flag uncertain areas" },
+        ],
+        output: `{
+  "agreement_score": 0.85,
+  "confirmed_signals": ["creative expression", "discipline", "performance confidence"],
+  "conflicts_resolved": [
+    {"conflict": "Profile: tech interest vs Psychometric: arts-dominant",
+     "resolution": "Showcase confirms arts. Tech interest is secondary hobby, not career driver."}
+  ],
+  "final_confidence": "HIGH — 3 independent sources converge on creative performer"
+}`
+      }
+    ]
+  }
+};
+
+// ─── Gate Data ───
+const gates = {
+  1: {
+    title: "⚡ Confidence Gate 1",
+    subtitle: "Between Stage 1 (Profile) → Stage 2 (Psychometric)",
+    question: "Do we have enough profile data to proceed intelligently?",
+    formula: "confidence = coverage(0.4) + clarity(0.3) + richness(0.3)",
+    decisions: [
+      { condition: "HIGH (> 0.7)", type: "high", action: "Rich profile. Reduce psychometric depth — skip redundant questions that profile already answers. Weight profile higher in final merge (0.35 instead of 0.25)." },
+      { condition: "MEDIUM (0.4–0.7)", type: "medium", action: "Normal flow. Run full psychometric. Standard weights." },
+      { condition: "LOW (< 0.4)", type: "low", action: "Sparse profile. Extend psychometric — add extra probing questions. Reduce profile weight in merge (0.15). Psychometric must compensate." },
+    ],
+    orchestratorSteps: [
+      { step: "Validate profile_signals JSON", detail: "Check: valid structure? Required fields present? No empty arrays?", type: "validate" },
+      { step: "Handle VLM failures", detail: "If parsing failed → retry once. Still fails → mark file as unreadable, proceed with remaining.", type: "error" },
+      { step: "Compute confidence score", detail: "coverage (how many fields filled) + clarity (are interests clear?) + richness (3+ achievements?)", type: "compute" },
+      { step: "Route based on confidence", detail: "HIGH → shortened Stage 2. MEDIUM → full Stage 2. LOW → extended Stage 2.", type: "decide" },
+      { step: "Store profile_signals + confidence", detail: "Persist to session. Tag profile as 'rich' or 'sparse' for downstream use.", type: "store" },
+      { step: "Trigger Stage 2 with appropriate depth", detail: "Load question bank (full or reduced based on gate decision).", type: "trigger" },
+    ]
+  },
+  2: {
+    title: "🧠 Confidence Gate 2",
+    subtitle: "Between Stage 2 (Psychometric) → Stage 3 (Showcase)",
+    question: "Are we confident enough to pick the RIGHT showcase? Or do signals conflict?",
+    formula: "confidence = agreement(0.4) + strength(0.3) + coverage(0.3)",
+    decisions: [
+      { condition: "HIGH (> 0.8)", type: "high", action: "Signals strongly agree. Showcase is OPTIONAL — can skip to Stage 4. If taken, pick showcase that adds NEW info (not confirmation)." },
+      { condition: "MEDIUM (0.5–0.8)", type: "medium", action: "Normal confidence. Pick showcase aligned with top interest. Standard flow." },
+      { condition: "LOW (< 0.5)", type: "low", action: "Weak/scattered signals. Showcase becomes CRITICAL — it's the tiebreaker. Pick showcase for the STRONGEST single signal." },
+      { condition: "CONFLICT", type: "conflict", action: "Profile says X, psychometric says Y. Pick showcase that RESOLVES the contradiction. e.g., Profile: dance medals. Test: analytical thinker. → Ask for dance video to see which is stronger." },
+    ],
+    orchestratorSteps: [
+      { step: "Validate all MCQs answered", detail: "Check completeness. Sliders have non-default values?", type: "validate" },
+      { step: "Run Rule Scorer (instant)", detail: "MCQ/slider/ranking → rule_signals. Pure code, <1ms.", type: "compute" },
+      { step: "Run Agent 2: Profile Analyst", detail: "Open text → LLM-as-Judge → text_signals. ~3 seconds.", type: "agent" },
+      { step: "Run Profile Builder: merge", detail: "profile_signals + rule_signals + text_signals → UNIFIED PROFILE.", type: "compute" },
+      { step: "Compute confidence + check conflicts", detail: "Do all 3 streams agree? How strong? How much coverage?", type: "compute" },
+      { step: "DECISION: Select showcase type", detail: "Based on confidence level: skip, standard pick, critical pick, or conflict-resolver.", type: "decide" },
+      { step: "Build personalized showcase request", detail: "Generate the specific ask with upload instructions for this student.", type: "trigger" },
+    ]
+  },
+  3: {
+    title: "✅ Confidence Gate 3",
+    subtitle: "Between Stage 3 (Showcase) → Stage 4 (Career Path)",
+    question: "How sure are we before making career recommendations?",
+    formula: "confidence = agreement(0.4) + signal_strength(0.3) + showcase_quality(0.3)",
+    decisions: [
+      { condition: "HIGH (> 0.8)", type: "high", action: "Strong agreement across all sources. Give DEFINITIVE recommendations. 'We're confident these are your top paths.'" },
+      { condition: "MEDIUM (0.5–0.8)", type: "medium", action: "Good signal but some uncertainty. Frame as 'strong directions to explore' rather than definitive answers." },
+      { condition: "LOW (< 0.5)", type: "low", action: "Uncertain. Present as EXPLORATORY: 'Here are directions to investigate.' Suggest retaking assessment after 6 months." },
+      { condition: "SHOWCASE SKIPPED", type: "conflict", action: "No showcase data. Adjust weights: profile(0.35) + rules(0.35) + text(0.30). Frame as 'initial direction' not 'definitive.'" },
+    ],
+    orchestratorSteps: [
+      { step: "Receive showcase_signals from Agent 3", detail: "Validate JSON. Scores in 0-1 range? Handle skip case.", type: "validate" },
+      { step: "Handle no-showcase case", detail: "Student skipped → adjust weights, lower confidence ceiling.", type: "decide" },
+      { step: "Merge showcase into unified profile", detail: "Boost confirmed dimensions, adjust contradicted ones.", type: "compute" },
+      { step: "Compute final confidence", detail: "All sources in agreement? How strong? Showcase confirmed or contradicted?", type: "compute" },
+      { step: "Run Career Matcher (algorithm)", detail: "Profile × career DB → ranked matches. No API call. Instant.", type: "compute" },
+      { step: "Dispatch Agent 4 + 5 in PARALLEL", detail: "Pathway Planner + Communicator don't depend on each other — run simultaneously.", type: "agent" },
+      { step: "Tag recommendation confidence level", detail: "Tell Communicator: 'definitive' vs 'exploratory' vs 'initial direction'.", type: "trigger" },
+    ]
+  }
+};
+
+// ─── Lens Data ───
+const lensData = {
+  painting: { icon: "🎨", name: "Painting",
+    criteria: [
+      { what: "Composition", reveals: "Spatial intelligence" },
+      { what: "Color choices", reveals: "Emotional expression" },
+      { what: "Detail level", reveals: "Patience, focus" },
+      { what: "Realism vs abstract", reveals: "Concrete vs conceptual" },
+      { what: "Originality", reveals: "Independent thinking" },
+      { what: "Technical skill", reveals: "Self-discipline" },
+    ], careers: "Designer, Architect, Animator, Art Director" },
+  singing: { icon: "🎤", name: "Singing",
+    criteria: [
+      { what: "Pitch accuracy", reveals: "Attention to detail" },
+      { what: "Rhythm", reveals: "Pattern thinking" },
+      { what: "Emotional delivery", reveals: "Empathy" },
+      { what: "Song choice", reveals: "Self-awareness" },
+      { what: "Originality", reveals: "Creative independence" },
+    ], careers: "Performer, Music Producer, Sound Engineer" },
+  writing: { icon: "✍️", name: "Writing",
+    criteria: [
+      { what: "Vocabulary", reveals: "Curiosity, reading" },
+      { what: "Structure", reveals: "Logical thinking" },
+      { what: "Emotional depth", reveals: "Empathy" },
+      { what: "Originality", reveals: "Independent thinking" },
+      { what: "Clarity", reveals: "Communication skill" },
+    ], careers: "Journalist, Author, Lawyer, Screenwriter" },
+  content: { icon: "📱", name: "Content",
+    criteria: [
+      { what: "Editing quality", reveals: "Technical skill" },
+      { what: "Storytelling", reveals: "Narrative intelligence" },
+      { what: "On-camera presence", reveals: "Social confidence" },
+      { what: "Engagement hooks", reveals: "Marketing instinct" },
+    ], careers: "Digital Marketer, Filmmaker, Entrepreneur" },
+  dance: { icon: "💃", name: "Dance",
+    criteria: [
+      { what: "Rhythm", reveals: "Discipline" },
+      { what: "Expressiveness", reveals: "Emotional intelligence" },
+      { what: "Technique", reveals: "Years of training" },
+      { what: "Space usage", reveals: "Confidence" },
+      { what: "Style choice", reveals: "Traditional vs experimental" },
+    ], careers: "Choreographer, Performer, Creative Director" },
+  coding: { icon: "💻", name: "Coding",
+    criteria: [
+      { what: "Problem choice", reveals: "Ambition" },
+      { what: "Solution approach", reveals: "Analytical vs creative" },
+      { what: "Code clarity", reveals: "Communication" },
+      { what: "Completeness", reveals: "Follow-through" },
+      { what: "Complexity", reveals: "Intellectual capacity" },
+    ], careers: "Software Engineer, Data Scientist, Founder" },
+  speaking: { icon: "🗣️", name: "Speaking",
+    criteria: [
+      { what: "Argument structure", reveals: "Logical thinking" },
+      { what: "Persuasiveness", reveals: "Influence ability" },
+      { what: "Body language", reveals: "Confidence" },
+      { what: "Evidence usage", reveals: "Research ability" },
+    ], careers: "Lawyer, Consultant, CEO, Diplomat" },
+};
+
+// ─── Render Functions ───
+
+function showOrchestratorOverview() {
+  clearActive();
+  const panel = document.getElementById('detailPanel');
+
+  let html = `<h2>⚙️ Orchestrator — Full Flow Overview</h2>`;
+  html += `<p class="detail-subtitle">The orchestrator is pure Python code (NOT an LLM). Click a tab to explore.</p>`;
+
+  // Tabs
+  html += `<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">`;
+  html += `<button onclick="showOrchTab('role')" id="orch-tab-role" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--green);color:white;font-weight:700;font-size:12px;cursor:pointer">What It Does</button>`;
+  html += `<button onclick="showOrchTab('pipeline')" id="orch-tab-pipeline" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-weight:700;font-size:12px;cursor:pointer">Pipeline Execution</button>`;
+  html += `<button onclick="showOrchTab('timing')" id="orch-tab-timing" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-weight:700;font-size:12px;cursor:pointer">Timing Breakdown</button>`;
+  html += `</div>`;
+
+  html += `<div id="orchTabContent"></div>`;
+  panel.innerHTML = html;
+  showOrchTab('role');
+}
+
+function showOrchTab(tab) {
+  // Update tab styles
+  ['role','pipeline','timing'].forEach(t => {
+    const btn = document.getElementById(`orch-tab-${t}`);
+    if (btn) {
+      btn.style.background = t === tab ? 'var(--green)' : 'var(--card)';
+      btn.style.color = t === tab ? 'white' : 'var(--ink)';
+    }
+  });
+
+  const container = document.getElementById('orchTabContent');
+  let html = '';
+
+  if (tab === 'role') {
+    html += `<div class="inner-flow"><h3>What the Orchestrator Does</h3><div class="flow-steps">`;
+    html += `<div class="flow-step"><div class="step-num">1</div><div class="step-content"><strong>Manages multi-pass reasoning chains</strong><br>Each agent runs 4-7 reasoning passes. Orchestrator sequences them, validates each pass output before triggering the next.</div></div>`;
+    html += `<div class="flow-step"><div class="step-num">2</div><div class="step-content"><strong>Runs cross-validation between stages</strong><br>After each stage, compares new signals with existing ones. Detects conflicts, updates confidence, adjusts downstream behavior.</div></div>`;
+    html += `<div class="flow-step"><div class="step-num">3</div><div class="step-content"><strong>Computes confidence at each gate</strong><br>Coverage + agreement + strength → confidence score. Routes adaptively: skip, extend, or change approach.</div></div>`;
+    html += `<div class="flow-step"><div class="step-num">4</div><div class="step-content"><strong>Maintains hypothesis tracking</strong><br>Stage 1 generates hypotheses. Stage 2 tests them. Stage 3 confirms/rejects. Stage 4 reasons based on surviving hypotheses.</div></div>`;
+    html += `<div class="flow-step"><div class="step-num">5</div><div class="step-content"><strong>Handles errors & retries with fallbacks</strong><br>LLM gives weak reasoning? Re-prompt with stricter constraints. Pass produces contradictory output? Run additional validation pass.</div></div>`;
+    html += `<div class="flow-step"><div class="step-num">6</div><div class="step-content"><strong>Controls depth adaptively</strong><br>High confidence early → some passes can be shortened. Low confidence → add extra cross-validation passes. Conflicts → trigger deeper reasoning.</div></div>`;
+    html += `</div></div>`;
+  }
+
+  else if (tab === 'pipeline') {
+    const typeColors = { validate:'#f59e0b', error:'#ef4444', store:'#6366f1', decide:'#ec4899', compute:'#10b981', agent:'#8b5cf6', trigger:'#06b6d4', cross:'#f97316' };
+    const typeLabels = { validate:'VALIDATE', error:'ERROR', store:'STORE', decide:'DECISION', compute:'COMPUTE', agent:'AGENT CALL', trigger:'OUTPUT', cross:'CROSS-VALIDATE' };
+    const pipeline = [
+      { step: "Stage 1: Agent 1 — Deep Profile Analysis (4 passes)", detail: "Pass 1: Extract facts → Pass 2: Infer implications → Pass 3: Identify gaps → Pass 4: Generate hypotheses", type: "agent" },
+      { step: "Gate 1: Validate + compute confidence", detail: "Is profile rich or sparse? Adjust downstream weights and psychometric depth.", type: "decide" },
+      { step: "Stage 2: Rule Scorer (instant)", detail: "MCQ/slider/ranking → rule_signals. Pure code.", type: "compute" },
+      { step: "Stage 2: Agent 2 — Deep Text Analysis (5 passes)", detail: "Pass 1: Surface reading → Pass 2: Deep reading → Pass 3: Pattern detection → Pass 4: Contradiction analysis → Pass 5: Hypothesis testing", type: "agent" },
+      { step: "Cross-Validation: Profile vs Psychometric", detail: "Do profile signals agree with psychometric? Where do they conflict? Which is more reliable for THIS student?", type: "cross" },
+      { step: "Stage 2: Profile Builder — merge + cross-validated weights", detail: "Merge 3 streams with adjusted weights based on cross-validation results.", type: "compute" },
+      { step: "Gate 2: Confidence + showcase decision", detail: "Signals agree? Conflicts detected? Pick showcase that resolves ambiguity.", type: "decide" },
+      { step: "Stage 3: Agent 3 — Deep Showcase Evaluation (5 passes)", detail: "Pass 1: Observe → Pass 2: Technical assess → Pass 3: Personality reading → Pass 4: Cross-reference → Pass 5: Career signal synthesis", type: "agent" },
+      { step: "Cross-Validation: All 3 Sources", detail: "Full triangulation — profile + psychometric + showcase. What hypothesis is supported by ALL evidence?", type: "cross" },
+      { step: "Gate 3: Final confidence + merge", detail: "Set recommendation confidence level: definitive / exploratory / initial.", type: "decide" },
+      { step: "Stage 4: Career Matcher (algorithm)", detail: "Profile × career DB → ranked matches. Deterministic.", type: "compute" },
+      { step: "Stage 4: Agent 4 — Deep Career Reasoning (7 passes)", detail: "Pass 1: Synthesize → Pass 2: Explore 8-10 careers → Pass 3: Deep evaluate → Pass 4: India context → Pass 5: Pathway → Pass 6: Confidence → Pass 7: Communicate", type: "agent" },
+      { step: "Assemble final output", detail: "Matches + deep reasoning + pathways + narrative → comprehensive career guidance.", type: "trigger" },
+    ];
+
+    html += `<div class="inner-flow"><h3>📋 Multi-Reasoning Pipeline (13 Steps)</h3><div class="flow-steps">`;
+    pipeline.forEach((step, i) => {
+      const color = typeColors[step.type] || '#94a3b8';
+      const label = typeLabels[step.type] || '';
+      html += `<div class="flow-step"><div class="step-num" style="background:${color}22;color:${color};border:1px solid ${color}44">${i+1}</div><div class="step-content"><span style="font-size:9px;color:${color};font-weight:700">${label}</span><br><strong>${step.step}</strong><br>${step.detail}</div></div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  else if (tab === 'timing') {
+    html += `<div class="inner-flow"><h3>⏱️ Session Timing (Multi-Reasoning)</h3><div class="flow-steps">`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#6366f122;color:#6366f1">👤</div><div class="step-content"><strong>User: Upload profile documents</strong><br>3-5 min (user gathers and uploads files)</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#8b5cf622;color:#8b5cf6">🤖</div><div class="step-content"><strong>AI: Deep profile analysis (4 passes)</strong><br>2-3 min — Extract → Infer → Identify gaps → Generate hypotheses</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#10b98122;color:#10b981">⚡</div><div class="step-content"><strong>Gate 1: Confidence routing</strong><br>Instant (code)</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#6366f122;color:#6366f1">👤</div><div class="step-content"><strong>User: Answer psychometric questions</strong><br>10-15 min (15-20 scenario questions + open text)</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#8b5cf622;color:#8b5cf6">🤖</div><div class="step-content"><strong>AI: Deep text analysis (5 passes)</strong><br>3-5 min — Surface → Deep reading → Patterns → Contradictions → Hypothesis test</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#f9731622;color:#f97316">🔄</div><div class="step-content"><strong>AI: Cross-validation (Profile vs Psychometric)</strong><br>1-2 min — Compare sources, resolve conflicts, update confidence</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#10b98122;color:#10b981">⚡</div><div class="step-content"><strong>Gate 2: Showcase decision</strong><br>Instant (code) — picks what to request based on cross-validation</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#6366f122;color:#6366f1">👤</div><div class="step-content"><strong>User: Record/upload showcase</strong><br>3-5 min (record video, upload art, submit code)</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#8b5cf622;color:#8b5cf6">🤖</div><div class="step-content"><strong>AI: Deep showcase evaluation (5 passes)</strong><br>3-5 min — Observe → Technical → Personality → Cross-reference → Career signals</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#f9731622;color:#f97316">🔄</div><div class="step-content"><strong>AI: Full triangulation (all 3 sources)</strong><br>2-3 min — What hypothesis is supported by ALL evidence?</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#10b98122;color:#10b981">⚡</div><div class="step-content"><strong>Gate 3 + Career Matcher</strong><br>Instant (algorithm) — deterministic matching</div></div>`;
+    html += `<div class="flow-step"><div class="step-num" style="background:#8b5cf622;color:#8b5cf6">🤖</div><div class="step-content"><strong>AI: Deep career reasoning (7 passes)</strong><br>5-8 min — Synthesize → Explore → Evaluate → India context → Pathways → Confidence → Communicate</div></div>`;
+    html += `</div>`;
+
+    // Summary box
+    html += `<div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">`;
+    html += `<div style="padding:14px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:10px;text-align:center"><div style="font-size:10px;color:#818cf8;font-weight:700;margin-bottom:4px">USER TIME</div><div style="font-size:20px;font-weight:700">16-25 min</div><div style="font-size:11px;color:var(--muted)">Uploading + answering</div></div>`;
+    html += `<div style="padding:14px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:10px;text-align:center"><div style="font-size:10px;color:#a78bfa;font-weight:700;margin-bottom:4px">AI REASONING</div><div style="font-size:20px;font-weight:700">15-22 min</div><div style="font-size:11px;color:var(--muted)">Deep multi-pass analysis</div></div>`;
+    html += `<div style="padding:14px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);border-radius:10px;text-align:center"><div style="font-size:10px;color:#22d3ee;font-weight:700;margin-bottom:4px">TOTAL SESSION</div><div style="font-size:20px;font-weight:700">25-35 min</div><div style="font-size:11px;color:var(--muted)">World-class thorough assessment</div></div>`;
+    html += `</div>`;
+
+    // Note
+    html += `<div style="margin-top:16px;padding:12px 16px;background:var(--card);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.5">`;
+    html += `<strong style="color:var(--ink)">Note:</strong> AI reasoning runs IN PARALLEL with user interaction where possible. While user answers questions (Stage 2), Agent 1's deep profile analysis is already complete. While user uploads showcase, cross-validation is running. The user never waits for the full AI time — much of it overlaps.`;
+    html += `</div>`;
+
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function clearActive() {
+  document.querySelectorAll('.phase-box').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.gate').forEach(el => el.classList.remove('active'));
+}
+
+function showPhase(num) {
+  clearActive();
+  document.querySelectorAll('.phase-box')[num - 1].classList.add('active');
+
+  const phase = phases[num];
+  const panel = document.getElementById('detailPanel');
+
+  let html = `<h2>${phase.title}</h2>`;
+  html += `<p class="detail-subtitle">${phase.subtitle}</p>`;
+  html += `<div class="agents-grid">`;
+  phase.agents.forEach((agent, i) => {
+    html += `
+      <div class="agent-card" onclick="showAgent(${num}, ${i})">
+        <div class="agent-type"><span class="tag ${agent.tag}">${agent.type}</span></div>
+        <div class="agent-name">${agent.name}</div>
+        <div class="agent-desc">${agent.desc}</div>
+      </div>`;
+  });
+  html += `</div><div id="agentDetail"></div>`;
+  panel.innerHTML = html;
+}
+
+function showAgent(phaseNum, agentIdx) {
+  const agent = phases[phaseNum].agents[agentIdx];
+  document.querySelectorAll('.agent-card').forEach((el, i) => el.classList.toggle('active', i === agentIdx));
+
+  let html = `<div class="inner-flow"><h3>⚡ Inner Flow: ${agent.name}</h3><div class="flow-steps">`;
+  agent.flow.forEach((step, i) => {
+    html += `<div class="flow-step"><div class="step-num">${i+1}</div><div class="step-content"><strong>${step.step}</strong><br>${step.detail}</div></div>`;
+  });
+  html += `</div>`;
+
+  if (agent.hasLenses) {
+    html += `<h3 style="margin-top:20px">🔍 Evaluation Lenses (click to explore)</h3><div class="lens-grid">`;
+    Object.entries(lensData).forEach(([key, lens]) => {
+      html += `<div class="lens-item" id="lens-${key}" onclick="showLens('${key}')"><div class="lens-icon">${lens.icon}</div><div class="lens-name">${lens.name}</div></div>`;
+    });
+    html += `</div><div id="lensDetail"></div>`;
+  }
+
+  if (agent.output) {
+    html += `<h3 style="margin-top:20px">📤 Output</h3><div class="output-box">${agent.output}</div>`;
+  }
+  html += `</div>`;
+  document.getElementById('agentDetail').innerHTML = html;
+}
+
+function showLens(key) {
+  const lens = lensData[key];
+  document.querySelectorAll('.lens-item').forEach(el => el.classList.toggle('active', el.id === `lens-${key}`));
+  let html = `<div class="lens-detail"><h4>${lens.icon} ${lens.name} — Criteria</h4><ul class="criteria-list">`;
+  lens.criteria.forEach(c => { html += `<li><span>${c.what}</span><span class="reveals">→ ${c.reveals}</span></li>`; });
+  html += `</ul><p style="margin-top:12px;font-size:12px;color:var(--accent3)"><strong>Careers:</strong> ${lens.careers}</p></div>`;
+  document.getElementById('lensDetail').innerHTML = html;
+}
+
+function showGate(num) {
+  clearActive();
+  document.querySelectorAll('.gate')[num - 1].classList.add('active');
+
+  const gate = gates[num];
+  const panel = document.getElementById('detailPanel');
+
+  const typeColors = { validate:'#f59e0b', error:'#ef4444', store:'#6366f1', decide:'#ec4899', compute:'#10b981', agent:'#8b5cf6', trigger:'#06b6d4' };
+  const typeLabels = { validate:'✓ VALIDATE', error:'⚠️ ERROR', store:'💾 STORE', decide:'🧠 DECIDE', compute:'⚡ COMPUTE', agent:'🤖 AGENT', trigger:'→ TRIGGER' };
+
+  let html = `<h2>${gate.title}</h2>`;
+  html += `<p class="detail-subtitle">${gate.subtitle}</p>`;
+  html += `<div class="formula-box">📊 ${gate.formula}</div>`;
+  html += `<p style="font-size:13px;color:var(--ink);margin:12px 0"><strong>Key Question:</strong> ${gate.question}</p>`;
+
+  // Decision paths
+  html += `<h3 style="color:var(--green);font-size:14px;margin:16px 0 8px">Decision Paths</h3>`;
+  html += `<div class="gate-decisions">`;
+  gate.decisions.forEach(d => {
+    html += `<div class="gate-decision gd-${d.type}"><div class="gd-condition">${d.condition}</div><div class="gd-action">${d.action}</div></div>`;
+  });
+  html += `</div>`;
+
+  // Orchestrator steps
+  html += `<div class="inner-flow" style="margin-top:20px"><h3>⚙️ Orchestrator Steps at This Gate</h3><div class="flow-steps">`;
+  gate.orchestratorSteps.forEach((step, i) => {
+    const color = typeColors[step.type] || '#94a3b8';
+    const label = typeLabels[step.type] || '';
+    html += `<div class="flow-step"><div class="step-num" style="background:${color}22;color:${color};border:1px solid ${color}44">${i+1}</div><div class="step-content"><span style="font-size:9px;color:${color};font-weight:700">${label}</span><br><strong>${step.step}</strong><br>${step.detail}</div></div>`;
+  });
+  html += `</div></div>`;
+
+  panel.innerHTML = html;
+}
+
+function showTechStack() {
+  clearActive();
+  const panel = document.getElementById('detailPanel');
+
+  const categories = [
+    {
+      name: "Core AI / LLM",
+      color: "#8b5cf6",
+      items: [
+        { tech: "OpenAI GPT-4o", role: "Agent 2 (Profile Analyst), Agent 4 (Career Reasoning) — text reasoning, multi-pass analysis", why: "Best-in-class reasoning, structured JSON output, reliable" },
+        { tech: "Google Gemini 2.5 Pro", role: "Agent 1 (Profile Parser), Agent 3 (Showcase Evaluator) — multi-modal analysis", why: "Native video/image/audio understanding, long context window for documents" },
+        { tech: "Claude Opus/Sonnet (Anthropic)", role: "Fallback provider + Cross-Validator", why: "Excellent at nuanced analysis, strong safety alignment for minors" },
+      ]
+    },
+    {
+      name: "Backend / Orchestration",
+      color: "#10b981",
+      items: [
+        { tech: "Python 3.12+", role: "Primary language for orchestrator + all backend logic", why: "AI/ML ecosystem, async support, readability (your philosophy)" },
+        { tech: "FastAPI", role: "REST API layer — serves frontend, handles uploads, session management", why: "Async, fast, auto-docs, type validation, production-ready" },
+        { tech: "Celery + Redis", role: "Task queue for multi-pass reasoning (background processing)", why: "Long-running AI reasoning (5-8 min) can't block HTTP requests" },
+        { tech: "Pydantic", role: "Data validation — every agent input/output schema enforced", why: "Type safety, JSON schema validation, prevents garbage-in-garbage-out" },
+      ]
+    },
+    {
+      name: "Frontend",
+      color: "#6366f1",
+      items: [
+        { tech: "Next.js 14+ (React)", role: "Student-facing UI — forms, uploads, progress, results display", why: "SSR for speed, file upload handling, real-time progress updates via WebSocket" },
+        { tech: "Tailwind CSS", role: "Styling — responsive, modern UI for teenagers", why: "Fast development, consistent design, mobile-first" },
+        { tech: "WebSocket (Socket.io)", role: "Real-time progress updates during AI reasoning", why: "Show 'Analyzing your dance video... Pass 3 of 5' in real-time" },
+      ]
+    },
+    {
+      name: "Database & Storage",
+      color: "#f59e0b",
+      items: [
+        { tech: "PostgreSQL", role: "Primary database — student profiles, sessions, career DB, feedback", why: "Reliable, JSONB for flexible signals, full-text search, proven at scale" },
+        { tech: "Redis", role: "Session state, caching, task queue broker, rate limiting", why: "Fast in-memory store for active sessions + Celery broker" },
+        { tech: "AWS S3 / Cloudflare R2", role: "File storage — uploaded resumes, videos, images, audio", why: "Scalable object storage, CDN delivery, cost-effective" },
+        { tech: "Pinecone / pgvector", role: "Vector DB for career matching (at scale) + RAG retrieval", why: "Semantic similarity search when career DB exceeds 50+ entries" },
+      ]
+    },
+    {
+      name: "Multi-Modal Processing",
+      color: "#ec4899",
+      items: [
+        { tech: "FFmpeg", role: "Video processing — extract keyframes, compress, format conversion", why: "Industry standard for video/audio manipulation before VLM analysis" },
+        { tech: "Whisper (OpenAI)", role: "Audio transcription — singing, speaking, audio showcases", why: "Best speech-to-text, handles Indian accents, multilingual" },
+        { tech: "PyMuPDF / pdf2image", role: "PDF parsing — extract text + images from uploaded documents", why: "Fast, reliable PDF extraction before VLM analysis" },
+      ]
+    },
+    {
+      name: "Observability & Safety",
+      color: "#06b6d4",
+      items: [
+        { tech: "LangSmith / Langfuse", role: "LLM observability — trace every reasoning pass, log prompts, measure quality", why: "Debug multi-pass chains, cost tracking, quality monitoring" },
+        { tech: "Sentry", role: "Error tracking — catch failures in orchestrator, agents, frontend", why: "Real-time error alerts, stack traces, performance monitoring" },
+        { tech: "OpenAI Moderation API", role: "Input/output safety filtering for content involving minors", why: "Pre-built content moderation, fast, reliable" },
+        { tech: "Prometheus + Grafana", role: "System metrics — latency, cost per session, throughput, error rates", why: "Industry standard monitoring stack" },
+      ]
+    },
+    {
+      name: "Infrastructure & Deployment",
+      color: "#f97316",
+      items: [
+        { tech: "Docker + Docker Compose", role: "Containerization — consistent environments, easy deployment", why: "Reproducible builds, isolates services, works anywhere" },
+        { tech: "AWS ECS / Google Cloud Run", role: "Container orchestration — auto-scaling, managed deployment", why: "Scale up during school hours, scale down at night. Pay per use." },
+        { tech: "GitHub Actions", role: "CI/CD — automated testing, prompt regression tests, deployment", why: "Integrated with code, runs eval suite on every change" },
+        { tech: "Terraform", role: "Infrastructure as code — reproducible cloud setup", why: "Version-controlled infra, multi-environment (dev/staging/prod)" },
+      ]
+    },
+    {
+      name: "Evaluation & Testing",
+      color: "#a855f7",
+      items: [
+        { tech: "pytest + pytest-asyncio", role: "Unit + integration tests for orchestrator, agents, scoring logic", why: "Standard Python testing, async support for agent tests" },
+        { tech: "DeepEval / RAGAS", role: "LLM output evaluation — measure reasoning quality, factual accuracy", why: "Automated quality scoring for multi-pass agent outputs" },
+        { tech: "Custom eval harness", role: "Run 100+ test profiles → compare outputs → regression detection", why: "Catch quality drops before they reach students" },
+      ]
+    },
+  ];
+
+  let html = `<h2>🛠️ Tech Stack</h2>`;
+  html += `<p class="detail-subtitle">Complete technology stack for production deployment. Click any category to expand.</p>`;
+
+  // Category tabs
+  html += `<div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">`;
+  categories.forEach((cat, i) => {
+    html += `<button onclick="showStackCategory(${i})" id="stack-tab-${i}" style="padding:6px 12px;border-radius:6px;border:1px solid ${cat.color}44;background:${i===0 ? cat.color : 'transparent'};color:${i===0 ? 'white' : cat.color};font-weight:600;font-size:11px;cursor:pointer;transition:all 0.15s">${cat.name}</button>`;
+  });
+  html += `</div>`;
+  html += `<div id="stackContent"></div>`;
+
+  // Store categories globally for tab switching
+  window._stackCategories = categories;
+  panel.innerHTML = html;
+  showStackCategory(0);
+}
+
+function showStackCategory(idx) {
+  const categories = window._stackCategories;
+  const cat = categories[idx];
+
+  // Update tabs
+  categories.forEach((c, i) => {
+    const btn = document.getElementById(`stack-tab-${i}`);
+    if (btn) {
+      btn.style.background = i === idx ? c.color : 'transparent';
+      btn.style.color = i === idx ? 'white' : c.color;
+    }
+  });
+
+  let html = `<div class="inner-flow"><h3 style="color:${cat.color}">${cat.name}</h3>`;
+  html += `<div style="display:flex;flex-direction:column;gap:12px">`;
+
+  cat.items.forEach(item => {
+    html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;border-left:3px solid ${cat.color}">`;
+    html += `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${item.tech}</div>`;
+    html += `<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${item.role}</div>`;
+    html += `<div style="font-size:11px;color:${cat.color}"><strong>Why:</strong> ${item.why}</div>`;
+    html += `</div>`;
+  });
+
+  html += `</div></div>`;
+  document.getElementById('stackContent').innerHTML = html;
+}
+
+// ─── Costing Comparison ───
+function showCosting() {
+  clearActive();
+  const panel = document.getElementById('detailPanel');
+
+  let html = `<h2>💰 Costing Comparison</h2>`;
+  html += `<p class="detail-subtitle">Cost per student session (~25-35 min, multi-reasoning). Click tabs to compare.</p>`;
+
+  html += `<div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">`;
+  html += `<button onclick="showCostTab('llm')" id="cost-tab-llm" style="padding:6px 12px;border-radius:6px;border:1px solid #f59e0b44;background:#f59e0b;color:white;font-weight:600;font-size:11px;cursor:pointer">LLM Token Costs</button>`;
+  html += `<button onclick="showCostTab('cloud')" id="cost-tab-cloud" style="padding:6px 12px;border-radius:6px;border:1px solid #6366f144;background:transparent;color:#6366f1;font-weight:600;font-size:11px;cursor:pointer">Cloud (AWS vs GCP vs Azure)</button>`;
+  html += `<button onclick="showCostTab('monthly')" id="cost-tab-monthly" style="padding:6px 12px;border-radius:6px;border:1px solid #10b98144;background:transparent;color:#10b981;font-weight:600;font-size:11px;cursor:pointer">Monthly Estimate</button>`;
+  html += `<button onclick="showCostTab('hosting')" id="cost-tab-hosting" style="padding:6px 12px;border-radius:6px;border:1px solid #ec489944;background:transparent;color:#ec4899;font-weight:600;font-size:11px;cursor:pointer">Hosting & Deployment</button>`;
+  html += `</div>`;
+  html += `<div id="costContent"></div>`;
+  panel.innerHTML = html;
+  showCostTab('llm');
+}
+
+function showCostTab(tab) {
+  const tabs = ['llm','cloud','monthly','hosting'];
+  const colors = ['#f59e0b','#6366f1','#10b981','#ec4899'];
+  tabs.forEach((t,i) => {
+    const btn = document.getElementById(`cost-tab-${t}`);
+    if(btn) { btn.style.background = t===tab ? colors[i] : 'transparent'; btn.style.color = t===tab ? 'white' : colors[i]; }
+  });
+
+  let html = '';
+
+  if (tab === 'llm') {
+    html += `<div class="inner-flow"><h3 style="color:#f59e0b">LLM Token Costs Per Student Session</h3>`;
+    html += `<p style="font-size:12px;color:var(--muted);margin-bottom:16px">Based on ~15-20 LLM calls per session (multi-reasoning passes). Prices as of 2025.</p>`;
+
+    // Token usage breakdown
+    html += `<div style="background:var(--card);border-radius:10px;padding:16px;margin-bottom:16px">`;
+    html += `<div style="font-weight:700;font-size:13px;margin-bottom:10px">📊 Estimated Token Usage Per Session</div>`;
+    html += `<table style="width:100%;font-size:12px;border-collapse:collapse">`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--muted)">Agent</th><th style="text-align:right;padding:6px;color:var(--muted)">Input Tokens</th><th style="text-align:right;padding:6px;color:var(--muted)">Output Tokens</th><th style="text-align:right;padding:6px;color:var(--muted)">Calls</th></tr>`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Agent 1: Profile Parser (VLM)</td><td style="text-align:right;padding:6px">~8,000</td><td style="text-align:right;padding:6px">~3,000</td><td style="text-align:right;padding:6px">4</td></tr>`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Agent 2: Profile Analyst</td><td style="text-align:right;padding:6px">~6,000</td><td style="text-align:right;padding:6px">~2,500</td><td style="text-align:right;padding:6px">5</td></tr>`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Agent 3: Showcase Evaluator (VLM)</td><td style="text-align:right;padding:6px">~10,000</td><td style="text-align:right;padding:6px">~3,000</td><td style="text-align:right;padding:6px">5</td></tr>`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Cross-Validator</td><td style="text-align:right;padding:6px">~4,000</td><td style="text-align:right;padding:6px">~2,000</td><td style="text-align:right;padding:6px">2</td></tr>`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:6px">Agent 4: Career Reasoning (7 passes)</td><td style="text-align:right;padding:6px">~12,000</td><td style="text-align:right;padding:6px">~5,000</td><td style="text-align:right;padding:6px">7</td></tr>`;
+    html += `<tr style="font-weight:700;background:rgba(245,158,11,0.1)"><td style="padding:8px">TOTAL PER SESSION</td><td style="text-align:right;padding:8px">~40,000</td><td style="text-align:right;padding:8px">~15,500</td><td style="text-align:right;padding:8px">~23</td></tr>`;
+    html += `</table></div>`;
+
+    // Provider comparison
+    html += `<div style="font-weight:700;font-size:13px;margin-bottom:10px">💵 Cost Per Session by Provider</div>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">`;
+
+    const providers = [
+      { name:'GPT-4o', color:'#10b981', input:'$2.50/1M', output:'$10.00/1M', session:'$0.26', note:'Best reasoning. Good for Agent 2 & 4.' },
+      { name:'GPT-4o-mini', color:'#6ee7b7', input:'$0.15/1M', output:'$0.60/1M', session:'$0.015', note:'Cheap. Good for early passes & cross-validation.' },
+      { name:'Claude Sonnet 4', color:'#8b5cf6', input:'$3.00/1M', output:'$15.00/1M', session:'$0.35', note:'Strong reasoning + safety. Good for career advice to minors.' },
+      { name:'Claude Opus 4', color:'#6366f1', input:'$15.00/1M', output:'$75.00/1M', session:'$1.76', note:'Deepest reasoning. Use only for final career pass.' },
+      { name:'Gemini 2.5 Pro', color:'#ec4899', input:'$1.25/1M', output:'$10.00/1M', session:'$0.21', note:'Native multi-modal. Best for VLM agents (1 & 3).' },
+      { name:'Gemini 2.5 Flash', color:'#f472b6', input:'$0.15/1M', output:'$0.60/1M', session:'$0.015', note:'Ultra cheap. Good for early reasoning passes.' },
+    ];
+
+    providers.forEach(p => {
+      html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;border-top:3px solid ${p.color}">`;
+      html += `<div style="font-weight:700;font-size:14px;color:${p.color}">${p.name}</div>`;
+      html += `<div style="font-size:11px;color:var(--muted);margin:4px 0">Input: ${p.input} | Output: ${p.output}</div>`;
+      html += `<div style="font-size:16px;font-weight:700;margin:6px 0">${p.session} <span style="font-size:11px;color:var(--muted);font-weight:400">/ session</span></div>`;
+      html += `<div style="font-size:11px;color:var(--muted)">${p.note}</div>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+
+    // Recommended mix
+    html += `<div style="margin-top:16px;padding:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:10px">`;
+    html += `<div style="font-weight:700;font-size:13px;color:#10b981;margin-bottom:8px">✅ Recommended Mix (cost-optimized)</div>`;
+    html += `<div style="font-size:12px;color:var(--muted);line-height:1.8">`;
+    html += `• Agent 1 & 3 (VLM): <strong>Gemini 2.5 Pro</strong> — $0.21/session (native multi-modal)<br>`;
+    html += `• Agent 2 early passes: <strong>GPT-4o-mini</strong> — $0.015/session (cheap, good enough)<br>`;
+    html += `• Agent 2 deep passes + Cross-Validator: <strong>GPT-4o</strong> — $0.10/session<br>`;
+    html += `• Agent 4 (Career Reasoning): <strong>Claude Sonnet 4</strong> — $0.20/session (safety + reasoning)<br>`;
+    html += `• <strong style="color:#10b981">TOTAL OPTIMIZED: ~$0.55 per student session</strong>`;
+    html += `</div></div>`;
+    html += `</div>`;
+  }
+
+  else if (tab === 'cloud') {
+    html += `<div class="inner-flow"><h3 style="color:#6366f1">Cloud Infrastructure Comparison</h3>`;
+    html += `<p style="font-size:12px;color:var(--muted);margin-bottom:16px">For 10,000 students/month. Prices are monthly estimates.</p>`;
+
+    html += `<table style="width:100%;font-size:12px;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden">`;
+    html += `<tr style="background:rgba(99,102,241,0.1)"><th style="text-align:left;padding:10px;color:var(--muted)">Resource</th><th style="text-align:center;padding:10px;color:#f59e0b">AWS</th><th style="text-align:center;padding:10px;color:#4285f4">GCP</th><th style="text-align:center;padding:10px;color:#0078d4">Azure</th></tr>`;
+
+    const rows = [
+      ['Compute (API Server)', '$45/mo (ECS Fargate, 2 vCPU)', '$40/mo (Cloud Run)', '$50/mo (Container Apps)'],
+      ['Task Queue Workers (AI reasoning)', '$90/mo (ECS, 4 vCPU burst)', '$80/mo (Cloud Run Jobs)', '$95/mo (Container Instances)'],
+      ['Database (PostgreSQL)', '$30/mo (RDS t4g.micro)', '$35/mo (Cloud SQL)', '$35/mo (Azure DB Flexible)'],
+      ['Redis (Cache + Queue)', '$15/mo (ElastiCache t4g.micro)', '$18/mo (Memorystore)', '$20/mo (Azure Cache)'],
+      ['Object Storage (uploads)', '$5/mo (S3, 100GB)', '$4/mo (Cloud Storage)', '$5/mo (Blob Storage)'],
+      ['CDN + Bandwidth', '$10/mo (CloudFront)', '$8/mo (Cloud CDN)', '$12/mo (Azure CDN)'],
+      ['Monitoring & Logging', '$20/mo (CloudWatch)', '$15/mo (Cloud Monitoring)', '$22/mo (Monitor)'],
+      ['DNS + SSL + Load Balancer', '$20/mo (ALB + Route53)', '$18/mo (Cloud LB)', '$22/mo (App Gateway)'],
+    ];
+
+    rows.forEach(row => {
+      html += `<tr style="border-top:1px solid var(--border)"><td style="padding:8px;font-weight:600">${row[0]}</td><td style="text-align:center;padding:8px;color:var(--muted)">${row[1]}</td><td style="text-align:center;padding:8px;color:var(--muted)">${row[2]}</td><td style="text-align:center;padding:8px;color:var(--muted)">${row[3]}</td></tr>`;
+    });
+
+    html += `<tr style="border-top:2px solid var(--border);font-weight:700;background:rgba(99,102,241,0.1)"><td style="padding:10px">TOTAL INFRA</td><td style="text-align:center;padding:10px;color:#f59e0b">~$235/mo</td><td style="text-align:center;padding:10px;color:#4285f4">~$218/mo</td><td style="text-align:center;padding:10px;color:#0078d4">~$261/mo</td></tr>`;
+    html += `</table>`;
+
+    // Recommendation
+    html += `<div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">`;
+    html += `<div style="padding:14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px;text-align:center"><div style="font-size:20px;margin-bottom:4px">🟠</div><div style="font-weight:700;font-size:13px;color:#f59e0b">AWS</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Best ecosystem. Bedrock for LLM. Most services. Higher cost.</div></div>`;
+    html += `<div style="padding:14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:10px;text-align:center"><div style="font-size:20px;margin-bottom:4px">🟢</div><div style="font-weight:700;font-size:13px;color:#10b981">GCP (Recommended)</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Cheapest. Native Gemini. Cloud Run perfect for burst AI workloads.</div></div>`;
+    html += `<div style="padding:14px;background:rgba(0,120,212,0.08);border:1px solid rgba(0,120,212,0.3);border-radius:10px;text-align:center"><div style="font-size:20px;margin-bottom:4px">🔵</div><div style="font-weight:700;font-size:13px;color:#0078d4">Azure</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Best OpenAI integration. Enterprise features. Highest baseline cost.</div></div>`;
+    html += `</div>`;
+    html += `</div>`;
+  }
+
+  else if (tab === 'monthly') {
+    html += `<div class="inner-flow"><h3 style="color:#10b981">Monthly Cost Estimate</h3>`;
+    html += `<p style="font-size:12px;color:var(--muted);margin-bottom:16px">Total platform cost at different scales. Using optimized LLM mix + GCP.</p>`;
+
+    // Scale comparison
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">`;
+
+    const scales = [
+      { students:'1,000', llm:'$550', infra:'$218', total:'$768', perStudent:'$0.77', color:'#10b981' },
+      { students:'5,000', llm:'$2,750', infra:'$350', total:'$3,100', perStudent:'$0.62', color:'#6366f1' },
+      { students:'10,000', llm:'$5,500', infra:'$500', total:'$6,000', perStudent:'$0.60', color:'#8b5cf6' },
+      { students:'50,000', llm:'$27,500', infra:'$1,200', total:'$28,700', perStudent:'$0.57', color:'#ec4899' },
+    ];
+
+    scales.forEach(s => {
+      html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;border-top:3px solid ${s.color}">`;
+      html += `<div style="font-size:11px;color:var(--muted);font-weight:600">STUDENTS/MONTH</div>`;
+      html += `<div style="font-size:22px;font-weight:700;color:${s.color};margin:4px 0">${s.students}</div>`;
+      html += `<div style="font-size:11px;color:var(--muted);margin-top:8px">LLM: ${s.llm}</div>`;
+      html += `<div style="font-size:11px;color:var(--muted)">Infra: ${s.infra}</div>`;
+      html += `<div style="font-size:16px;font-weight:700;margin-top:8px">${s.total}<span style="font-size:10px;color:var(--muted)">/mo</span></div>`;
+      html += `<div style="font-size:12px;color:${s.color};font-weight:600;margin-top:4px">${s.perStudent} per student</div>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+
+    // Cost breakdown pie-style
+    html += `<div style="background:var(--card);border-radius:10px;padding:16px;margin-bottom:16px">`;
+    html += `<div style="font-weight:700;font-size:13px;margin-bottom:12px">📊 Cost Breakdown (at 10K students/mo)</div>`;
+
+    const breakdown = [
+      { name:'LLM API Calls', pct:92, amount:'$5,500', color:'#f59e0b' },
+      { name:'Cloud Compute', pct:4, amount:'$220', color:'#6366f1' },
+      { name:'Database + Redis', pct:2, amount:'$100', color:'#10b981' },
+      { name:'Storage + CDN', pct:1, amount:'$50', color:'#ec4899' },
+      { name:'Monitoring', pct:1, amount:'$50', color:'#06b6d4' },
+    ];
+
+    breakdown.forEach(b => {
+      html += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">`;
+      html += `<div style="width:100px;font-size:11px;font-weight:600;color:var(--muted)">${b.name}</div>`;
+      html += `<div style="flex:1;height:20px;background:var(--bg);border-radius:4px;overflow:hidden"><div style="width:${b.pct}%;height:100%;background:${b.color};border-radius:4px"></div></div>`;
+      html += `<div style="width:60px;text-align:right;font-size:11px;font-weight:700;color:${b.color}">${b.amount}</div>`;
+      html += `<div style="width:30px;text-align:right;font-size:10px;color:var(--muted)">${b.pct}%</div>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+
+    // Key insight
+    html += `<div style="padding:14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px">`;
+    html += `<div style="font-weight:700;font-size:13px;color:#f59e0b;margin-bottom:6px">💡 Key Insight</div>`;
+    html += `<div style="font-size:12px;color:var(--muted);line-height:1.6">`;
+    html += `<strong>92% of cost is LLM tokens.</strong> Infrastructure is negligible. To reduce cost:<br>`;
+    html += `• Use cheaper models for early reasoning passes (GPT-4o-mini / Gemini Flash)<br>`;
+    html += `• Cache common profile patterns — similar students don't need full re-analysis<br>`;
+    html += `• Gate 2 can skip Showcase (saves 5 VLM calls) when confidence is already high<br>`;
+    html += `• Batch non-urgent passes using off-peak API pricing (50% cheaper)`;
+    html += `</div></div>`;
+    html += `</div>`;
+  }
+
+  else if (tab === 'hosting') {
+    html += `<div class="inner-flow"><h3 style="color:#ec4899">Development + Demo Hosting Cost (3-4 Months)</h3>`;
+    html += `<p style="font-size:12px;color:var(--muted);margin-bottom:16px">Full cloud resource cost during development phase. Includes dev environment, staging for demos, CI/CD, LLM testing, and all infra.</p>`;
+
+    // AWS breakdown
+    html += `<div style="background:var(--card);border-radius:12px;padding:18px;margin-bottom:16px;border-left:4px solid #f59e0b">`;
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">`;
+    html += `<div style="font-weight:700;font-size:16px;color:#f59e0b">☁️ AWS — 3 Month Development Cost</div>`;
+    html += `<div style="font-weight:700;font-size:18px;color:#f59e0b">~$2,800 - $3,500</div>`;
+    html += `</div>`;
+    html += `<table style="width:100%;font-size:11px;border-collapse:collapse">`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--muted)">Resource</th><th style="text-align:left;padding:6px;color:var(--muted)">Service</th><th style="text-align:right;padding:6px;color:var(--muted)">/Month</th><th style="text-align:right;padding:6px;color:var(--muted)">3 Months</th></tr>`;
+    const awsRows = [
+      ['Compute (API + Workers)', 'ECS Fargate (2 tasks, 1vCPU/2GB each)', '$75', '$225'],
+      ['Async Task Queue', 'SQS + Lambda (AI reasoning jobs)', '$30', '$90'],
+      ['Database', 'RDS PostgreSQL (db.t4g.small)', '$50', '$150'],
+      ['Redis', 'ElastiCache (cache.t4g.micro)', '$25', '$75'],
+      ['Object Storage', 'S3 (uploads: videos, images, PDFs)', '$10', '$30'],
+      ['CDN', 'CloudFront (frontend + media)', '$15', '$45'],
+      ['Container Registry', 'ECR (Docker images)', '$5', '$15'],
+      ['CI/CD', 'CodeBuild (10 builds/day avg)', '$20', '$60'],
+      ['Monitoring', 'CloudWatch + X-Ray (tracing)', '$30', '$90'],
+      ['Networking', 'ALB + NAT Gateway + Route53', '$45', '$135'],
+      ['Secrets', 'Secrets Manager + Parameter Store', '$5', '$15'],
+      ['LLM API (testing)', 'Bedrock (Claude) — ~200 test sessions/mo', '$110', '$330'],
+      ['LLM API (Gemini VLM)', 'Direct API — multi-modal test calls', '$80', '$240'],
+      ['Dev/Staging Envs', '2 environments running 12hrs/day', '$150', '$450'],
+    ];
+    awsRows.forEach(r => {
+      html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 6px">${r[0]}</td><td style="padding:5px 6px;color:var(--muted)">${r[1]}</td><td style="text-align:right;padding:5px 6px">${r[2]}</td><td style="text-align:right;padding:5px 6px">${r[3]}</td></tr>`;
+    });
+    html += `<tr style="font-weight:700;background:rgba(245,158,11,0.1)"><td colspan="2" style="padding:8px">TOTAL (3 months)</td><td style="text-align:right;padding:8px">~$650-$900</td><td style="text-align:right;padding:8px;color:#f59e0b">~$2,800-$3,500</td></tr>`;
+    html += `</table></div>`;
+
+    // GCP breakdown
+    html += `<div style="background:var(--card);border-radius:12px;padding:18px;margin-bottom:16px;border-left:4px solid #4285f4">`;
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">`;
+    html += `<div style="font-weight:700;font-size:16px;color:#4285f4">☁️ GCP — 3 Month Development Cost</div>`;
+    html += `<div style="font-weight:700;font-size:18px;color:#4285f4">~$1,900 - $2,500</div>`;
+    html += `</div>`;
+    html += `<table style="width:100%;font-size:11px;border-collapse:collapse">`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--muted)">Resource</th><th style="text-align:left;padding:6px;color:var(--muted)">Service</th><th style="text-align:right;padding:6px;color:var(--muted)">/Month</th><th style="text-align:right;padding:6px;color:var(--muted)">3 Months</th></tr>`;
+    const gcpRows = [
+      ['Compute (API)', 'Cloud Run (auto-scale to 0 when idle!)', '$35', '$105'],
+      ['Async Workers', 'Cloud Run Jobs + Cloud Tasks', '$25', '$75'],
+      ['Database', 'Cloud SQL PostgreSQL (db-f1-micro → small)', '$40', '$120'],
+      ['Redis', 'Memorystore (basic tier, 1GB)', '$20', '$60'],
+      ['Object Storage', 'Cloud Storage (uploads)', '$5', '$15'],
+      ['CDN', 'Cloud CDN + Load Balancer', '$20', '$60'],
+      ['Container Registry', 'Artifact Registry', '$3', '$9'],
+      ['CI/CD', 'Cloud Build (free 120 min/day)', '$10', '$30'],
+      ['Monitoring', 'Cloud Monitoring + Trace', '$15', '$45'],
+      ['Networking', 'Cloud Load Balancer + DNS', '$25', '$75'],
+      ['Secrets', 'Secret Manager', '$2', '$6'],
+      ['LLM API (Gemini native)', 'Vertex AI — Gemini 2.5 Pro (200 test sessions)', '$60', '$180'],
+      ['LLM API (Claude/GPT)', 'Direct API calls for reasoning agents', '$100', '$300'],
+      ['Dev/Staging Envs', 'Cloud Run scales to 0 — pay only when testing!', '$50', '$150'],
+    ];
+    gcpRows.forEach(r => {
+      html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 6px">${r[0]}</td><td style="padding:5px 6px;color:var(--muted)">${r[1]}</td><td style="text-align:right;padding:5px 6px">${r[2]}</td><td style="text-align:right;padding:5px 6px">${r[3]}</td></tr>`;
+    });
+    html += `<tr style="font-weight:700;background:rgba(66,133,244,0.1)"><td colspan="2" style="padding:8px">TOTAL (3 months)</td><td style="text-align:right;padding:8px">~$410-$600</td><td style="text-align:right;padding:8px;color:#4285f4">~$1,900-$2,500</td></tr>`;
+    html += `</table>`;
+    html += `<div style="margin-top:10px;font-size:11px;color:#4285f4;padding:8px;background:rgba(66,133,244,0.05);border-radius:6px">💡 <strong>GCP advantage:</strong> Cloud Run scales to 0 = no cost when not testing. $300 free credit for new accounts. Native Gemini = no external VLM API cost.</div>`;
+    html += `</div>`;
+
+    // Azure breakdown
+    html += `<div style="background:var(--card);border-radius:12px;padding:18px;margin-bottom:16px;border-left:4px solid #0078d4">`;
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">`;
+    html += `<div style="font-weight:700;font-size:16px;color:#0078d4">☁️ Azure — 3 Month Development Cost</div>`;
+    html += `<div style="font-weight:700;font-size:18px;color:#0078d4">~$3,000 - $3,800</div>`;
+    html += `</div>`;
+    html += `<table style="width:100%;font-size:11px;border-collapse:collapse">`;
+    html += `<tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px;color:var(--muted)">Resource</th><th style="text-align:left;padding:6px;color:var(--muted)">Service</th><th style="text-align:right;padding:6px;color:var(--muted)">/Month</th><th style="text-align:right;padding:6px;color:var(--muted)">3 Months</th></tr>`;
+    const azureRows = [
+      ['Compute (API)', 'Container Apps (2 replicas min)', '$65', '$195'],
+      ['Async Workers', 'Container Instances + Service Bus', '$40', '$120'],
+      ['Database', 'Azure Database for PostgreSQL (Flexible)', '$55', '$165'],
+      ['Redis', 'Azure Cache for Redis (Basic C0)', '$30', '$90'],
+      ['Object Storage', 'Blob Storage (uploads)', '$8', '$24'],
+      ['CDN', 'Azure CDN + Front Door', '$25', '$75'],
+      ['Container Registry', 'Azure Container Registry (Basic)', '$5', '$15'],
+      ['CI/CD', 'GitHub Actions (free) + Azure DevOps', '$15', '$45'],
+      ['Monitoring', 'Application Insights + Monitor', '$35', '$105'],
+      ['Networking', 'App Gateway + DNS Zone', '$50', '$150'],
+      ['Secrets', 'Key Vault', '$5', '$15'],
+      ['LLM API (Azure OpenAI)', 'GPT-4o via Azure OpenAI (200 test sessions)', '$130', '$390'],
+      ['LLM API (Gemini VLM)', 'Direct Google API for multi-modal', '$80', '$240'],
+      ['Dev/Staging Envs', '2 environments (Container Apps min instances)', '$160', '$480'],
+    ];
+    azureRows.forEach(r => {
+      html += `<tr style="border-bottom:1px solid var(--border)"><td style="padding:5px 6px">${r[0]}</td><td style="padding:5px 6px;color:var(--muted)">${r[1]}</td><td style="text-align:right;padding:5px 6px">${r[2]}</td><td style="text-align:right;padding:5px 6px">${r[3]}</td></tr>`;
+    });
+    html += `<tr style="font-weight:700;background:rgba(0,120,212,0.1)"><td colspan="2" style="padding:8px">TOTAL (3 months)</td><td style="text-align:right;padding:8px">~$700-$950</td><td style="text-align:right;padding:8px;color:#0078d4">~$3,000-$3,800</td></tr>`;
+    html += `</table></div>`;
+
+    // Summary comparison
+    html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">`;
+    html += `<div style="padding:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--muted);font-weight:600">AWS (3 months)</div><div style="font-size:22px;font-weight:700;color:#f59e0b;margin:6px 0">~$3,150</div><div style="font-size:10px;color:var(--muted)">Reliable but always-on = expensive idle time</div></div>`;
+    html += `<div style="padding:16px;background:rgba(16,185,129,0.12);border:2px solid rgba(16,185,129,0.4);border-radius:10px;text-align:center"><div style="font-size:11px;color:#10b981;font-weight:700">⭐ GCP (3 months) — RECOMMENDED</div><div style="font-size:22px;font-weight:700;color:#10b981;margin:6px 0">~$2,200</div><div style="font-size:10px;color:var(--muted)">Scale-to-zero = pay only during active development</div></div>`;
+    html += `<div style="padding:16px;background:rgba(0,120,212,0.08);border:1px solid rgba(0,120,212,0.3);border-radius:10px;text-align:center"><div style="font-size:11px;color:var(--muted);font-weight:600">Azure (3 months)</div><div style="font-size:22px;font-weight:700;color:#0078d4;margin:6px 0">~$3,400</div><div style="font-size:10px;color:var(--muted)">Highest baseline. Best if org already has Azure credits.</div></div>`;
+    html += `</div>`;
+
+    // Key assumptions
+    html += `<div style="padding:14px;background:var(--card);border-radius:10px;border:1px solid var(--border)">`;
+    html += `<div style="font-weight:700;font-size:12px;margin-bottom:8px">📋 Assumptions</div>`;
+    html += `<div style="font-size:11px;color:var(--muted);line-height:1.8">`;
+    html += `• 2 environments: dev (always on during work hours) + staging (for demos)<br>`;
+    html += `• ~200 AI test sessions/month (building & testing multi-reasoning pipeline)<br>`;
+    html += `• 1-2 developers actively building<br>`;
+    html += `• Video/audio/image uploads: ~50GB total over 3 months<br>`;
+    html += `• CI/CD: 8-10 deployments/day during active development<br>`;
+    html += `• Does NOT include: developer salaries, domain purchase, third-party SaaS tools`;
+    html += `</div></div>`;
+    html += `</div>`;
+  }
+
+
+
+  document.getElementById('costContent').innerHTML = html;
+}
+
+// Default
+showPhase(1);
+</script>
+</body>
+</html>

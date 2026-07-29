@@ -4,3 +4,4 @@ model_config.json
 *.pyc
 .ipynb_checkpoints/
 .env
+aws_resources.txt

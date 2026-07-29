@@ -1,0 +1,156 @@
+World-Class Scalable Backend + UI (Low Cost) - Notes
+Date: 2026-07-19
+
+Goal
+- Build a backend API + UI that can handle very high traffic reliably.
+- Keep cost as low as possible while maintaining quality and uptime.
+- Support text chat and file-based requests.
+
+Core Principle
+- Do NOT send every request to the biggest LLM synchronously.
+- Use layered handling:
+  1) cache/rules/small model first
+  2) retrieval + medium model second
+  3) large model only when needed
+  4) async queue for heavy file processing
+
+High-Level Architecture
+- UI Layer: web/mobile frontend
+- API Layer: stateless backend endpoints
+- Worker Layer: async heavy jobs (OCR, parsing, chunking, indexing, LLM)
+- Data Layer: metadata DB + object storage + cache + vector/retrieval store
+
+Request Flow
+1. User sends chat or uploads a file from UI.
+2. Edge layer (CDN/WAF) filters abuse and accelerates traffic.
+3. API validates auth, quotas, payload, and idempotency key.
+4. If simple chat: attempt cache or small model, return quickly.
+5. If file or heavy prompt: create job, push to queue, return job_id.
+6. Worker processes job and stores results.
+7. UI polls job endpoint or receives webhook/event update.
+
+AWS Resources (Recommended)
+- CloudFront: global edge caching and acceleration
+- AWS WAF: bot protection and request filtering
+- API Gateway or ALB: API entry
+- ECS Fargate: API service and worker service containers
+- S3: file uploads and output artifacts
+- SQS: async work queue
+- RDS PostgreSQL (or DynamoDB): users/jobs/metadata
+- ElastiCache Redis: hot cache, rate limits, dedup, idempotency
+- OpenSearch or pgvector: retrieval/vector search
+- CloudWatch + X-Ray: logs, metrics, traces
+- Secrets Manager + KMS: key and secret management
+- Optional: Amazon Bedrock for managed model inference
+
+API Endpoints (Starter)
+- POST /chat
+  - Input: user message, context reference, tenant_id
+  - Output: response (or streaming)
+- POST /upload
+  - Output: presigned S3 upload URL + file_id
+- POST /jobs
+  - Input: file_id + prompt or processing instructions
+  - Output: job_id, status=queued
+- GET /jobs/{job_id}
+  - Output: queued/running/succeeded/failed + result reference
+- GET /health
+  - Output: service health for load balancer and autoscaler
+
+Cost-Optimization Checklist
+- Enforce token limits per endpoint and per tenant.
+- Use response caching and semantic caching.
+- Route easy tasks to cheaper/smaller models.
+- Use retrieval to reduce prompt size.
+- Batch offline embedding/indexing work.
+- Prefer async processing for heavy requests.
+- Add per-tenant budgets and hard quotas.
+- Track cost per request and per customer in metrics.
+
+Reliability and Scale Checklist
+- Keep API stateless and horizontally scalable.
+- Multi-AZ deployment for API, DB, and cache.
+- Use retries with exponential backoff on transient failures.
+- Add circuit breaker and model/provider fallback.
+- Add dead-letter queue for failed jobs.
+- Use idempotency keys to avoid duplicate charges/work.
+- Implement graceful degradation under high load.
+
+Security Checklist
+- JWT/OAuth2 auth and tenant isolation.
+- Input validation and file type/content checks.
+- Malware scanning on uploaded files.
+- Encrypt in transit (TLS) and at rest (KMS).
+- Store secrets only in Secrets Manager.
+- Audit logs for compliance and incident tracing.
+
+Minimum Code Modules to Build
+- backend/api/: FastAPI routes, request validation, auth
+- backend/services/: orchestration, model routing, retrieval
+- backend/workers/: SQS consumers, file processing, OCR/chunking
+- backend/storage/: S3, DB, Redis adapters
+- backend/observability/: structured logs, metrics, traces
+- frontend/: chat UI, upload UI, job status UI
+
+Suggested Rollout Phases
+Phase 1 (MVP)
+- Chat endpoint + upload endpoint + job queue + status polling
+- One model provider + simple Redis cache + S3 + RDS
+
+Phase 2 (Scale)
+- Add model routing, semantic cache, retrieval index, DLQ, autoscaling tuning
+
+Phase 3 (World-Class)
+- Multi-region failover, advanced budget routing, adaptive quality tiers
+
+Discussion Baseline
+- This file is our shared baseline for implementation planning.
+- Next step: map these items to your current codebase and define exact files/classes.
+
+
+
+
+Folder Structure and Flow
+=========================
+
+backend/
+  app/
+    main.py              - 1. ENTRY POINT: creates FastAPI app, registers error handlers, includes routes
+    core/
+      config.py          - 2. FOUNDATION: settings from .env (used by everything)
+      logger.py          - 2. FOUNDATION: structured logging (used by everything)
+      exceptions.py      - 2. FOUNDATION: error classes + global handler
+    api/
+      routes.py          - 3. HTTP LAYER: all endpoints /health, /chat, /upload, /jobs/{id}
+    schemas/             - 4. DATA CONTRACTS: request/response validation models (to build)
+    services/            - 5. BUSINESS LOGIC: LLM caller, chat orchestration, caching (to build)
+    storage/             - 6. DATA ACCESS: S3, DB, Redis adapters (to build)
+    workers/             - 7. ASYNC JOBS: SQS consumer, file parser, chunker, embedder (to build)
+    observability/       - 8. MONITORING: metrics, tracing helpers (to build)
+  tests/
+    unit/                - 9. TESTS: fast isolated tests
+    integration/         - 9. TESTS: API, DB, queue flow tests
+  scripts/               - 10. DEV/OPS SCRIPTS
+  infra/terraform/       - 11. AWS INFRASTRUCTURE
+  requirements.txt
+  .env / .env.example
+
+Request Flow Through Folders
+============================
+1. Request hits main.py
+2. main.py routes to -> api/routes.py (the right endpoint)
+3. routes.py validates input using -> schemas/ (Pydantic models)
+4. routes.py calls -> services/ (business logic)
+5. services/ uses -> storage/ (S3, DB, Redis)
+6. If heavy work -> services/ pushes to -> workers/ (SQS queue)
+7. Every layer uses -> core/config.py, core/logger.py, core/exceptions.py
+
+Build Status
+============
+- core/              DONE
+- api/routes.py      DONE (with placeholders)
+- schemas/           NEXT
+- services/          NEXT
+- storage/           NEXT
+- workers/           LATER
+- observability/     LATER
