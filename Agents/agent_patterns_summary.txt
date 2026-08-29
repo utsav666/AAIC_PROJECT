@@ -1,0 +1,62 @@
+AGENT PATTERNS - COMPLETE MENTAL MAP
+=====================================
+
+1. AGENT TYPES (what the agent does)
+   - Knowledge/Retrieval Agent : answers from data, docs, databases
+   - Action Agent              : performs operations via tools/APIs
+
+2. EXECUTION PATTERNS (how a single agent works internally)
+   - ReAct                : decide -> act -> observe -> repeat
+   - Planner-Executor     : plan all steps first -> execute sequentially
+
+3. ORCHESTRATION (who decides what runs and in what order)
+   - Router               : classifies request ONCE, sends to the right agent/workflow
+   - Fixed Pipeline       : code hardcodes the agent sequence
+   - Supervisor            : an LLM decides dynamically, repeatedly, which agent/tool runs next
+   - Parallel Fan-out/in  : concurrent branches, then merge results
+   - Group-chat           : agents converse, a manager mediates
+
+4. CROSS-CUTTING QUALITY/SAFETY WRAPPERS (bolt onto any pattern above)
+   - Generator-Critic     : quality check loop (draft -> check -> revise -> approve)
+   - Human-in-the-Loop    : approval gate before risky/irreversible actions
+
+5. LOOP ENGINEERING (separate topic)
+   - Prompt design, tool schemas, memory, guardrails, evaluation, observability
+
+
+KEY DISTINCTIONS
+================
+
+ReAct vs Supervisor:
+  ReAct      = the LOOP MECHANISM (decide, act, observe, repeat)
+  Supervisor = a ROLE that uses that mechanism to route/delegate, not do work itself
+
+Router vs Supervisor:
+  Router     = decides ONCE at the start which agent handles the request
+  Supervisor = decides REPEATEDLY after every step which agent/tool goes next
+
+Single-agent vs Multi-agent:
+  Single-agent = one persona + tools (even if using ReAct loop)
+  Multi-agent  = multiple independent agents (each with own prompt/tools/LLM)
+
+Orchestrator:
+  Not a pattern itself — it's the LAYER that controls the overall flow
+  Can be implemented as: plain code, a graph (LangGraph), a supervisor LLM, or a workflow engine
+
+
+FILES IN THIS FOLDER
+====================
+
+sample_open_ai_connection.py   -> Plain LLM call (no agent)
+sample_agent.py                -> Single ReAct/tool-calling agent
+sample_multi_agent.py          -> Fixed multi-agent pipeline
+sample_multi_agent_orch.py     -> LangGraph conditional orchestration
+autogen/autogen_multi_agent.py -> Sequential agent handoff
+autogen/autogen_multi_agent_dorch.py -> Group-chat multi-agent
+
+planner_executor.py            -> Planner-Executor pattern
+generator_critic.py            -> Generator-Critic / Reflection pattern
+supervisor_loop.py             -> Supervisor pattern (dynamic routing)
+parallel_fanout_fanin.py       -> Parallel fan-out / fan-in pattern
+human_approval_gate.py         -> Human-in-the-loop approval gate
+llm_client.py                  -> Centralized LLM client factory
